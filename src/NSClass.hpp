@@ -22,7 +22,7 @@
 #ifndef __OBJC_CLASS_HPP__
 #define __OBJC_CLASS_HPP__
 
-#include "ObjCObject.hpp"
+#include "NSObject.hpp"
 
 using namespace godot;
 

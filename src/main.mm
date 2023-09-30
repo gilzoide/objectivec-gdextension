@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 #include "NSClass.hpp"
-#include "ObjCObject.hpp"
+#include "NSObject.hpp"
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjCObject.hpp"
+#include "NSObject.hpp"
 
 #include "objc_conversions.hpp"
 #include "objc_invocation.hpp"

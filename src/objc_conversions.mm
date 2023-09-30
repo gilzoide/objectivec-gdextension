@@ -21,8 +21,8 @@
  */
 #include "objc_conversions.hpp"
 
-#include "ObjCObject.hpp"
 #include "NSClass.hpp"
+#include "NSObject.hpp"
 
 #include <Foundation/Foundation.h>
 #include <objc/runtime.h>

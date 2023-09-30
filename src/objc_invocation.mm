@@ -22,7 +22,7 @@
 #include "objc_invocation.hpp"
 
 #include "NSClass.hpp"
-#include "ObjCObject.hpp"
+#include "NSObject.hpp"
 #include "objc_conversions.hpp"
 
 #include <Foundation/Foundation.h>
