@@ -22,3 +22,4 @@ addons/objectivec-gdextension/LICENSE
 .godot/
 test/godot
 app_userdata/
+test/build

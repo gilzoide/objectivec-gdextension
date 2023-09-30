@@ -11,9 +11,20 @@ config_version=5
 [application]
 
 config/name="Objective-C GDExtension Test"
+run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.1", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=300
+window/size/viewport_height=400
+window/stretch/mode="viewport"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
