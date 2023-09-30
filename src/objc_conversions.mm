@@ -74,7 +74,7 @@ Variant to_variant(NSObject *obj) {
 		return to_variant(data);
 	}
 	else {
-		return memnew(classes::ObjCObject(obj));
+		return memnew(classes::NSObject(obj));
 	}
 }
 
@@ -198,7 +198,7 @@ NSObject *to_nsobject(const Variant& value) {
 
 		case godot::Variant::OBJECT: {
 			Object *obj = value;
-			if (auto objc_obj = Object::cast_to<classes::ObjCObject>(obj)) {
+			if (auto objc_obj = Object::cast_to<classes::NSObject>(obj)) {
 				return objc_obj->get_obj();
 			}
 			else {

@@ -33,7 +33,7 @@ static void initialize(ModuleInitializationLevel level) {
 		return;
 	}
 
-	ClassDB::register_abstract_class<classes::ObjCObject>();
+	ClassDB::register_abstract_class<classes::NSObject>();
 	ClassDB::register_abstract_class<classes::NSClass>();
 }
 

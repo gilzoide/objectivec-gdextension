@@ -28,9 +28,9 @@
 
 namespace objcgdextension::classes {
 
-NSClass::NSClass() : ObjCObject() {}
+NSClass::NSClass() : NSObject() {}
 
-NSClass::NSClass(id obj) : ObjCObject(obj) {}
+NSClass::NSClass(id obj) : NSObject(obj) {}
 
 Variant NSClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
 	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "NSClass is null");

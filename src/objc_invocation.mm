@@ -99,8 +99,8 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		}
 			
 		case '#': {
-			classes::ObjCObject *obj;
-			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<classes::ObjCObject>(value))) {
+			classes::NSObject *obj;
+			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<classes::NSObject>(value))) {
 				return set_argument(buffer, invocation, arg_number, obj->get_obj());
 			}
 			else {

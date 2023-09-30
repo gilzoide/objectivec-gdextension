@@ -28,8 +28,8 @@ using namespace godot;
 
 namespace objcgdextension::classes {
 
-class NSClass : public ObjCObject {
-	GDCLASS(NSClass, ObjCObject);
+class NSClass : public NSObject {
+	GDCLASS(NSClass, NSObject);
 
 public:
 	NSClass();
