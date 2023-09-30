@@ -23,6 +23,8 @@
 #define __OBJC_INVOCATION_HPP__
 
 #include <Foundation/Foundation.h>
+
+#include <gdextension_interface.h>
 #include <godot_cpp/variant/variant.hpp>
 
 namespace objcgdextension {
@@ -33,7 +35,7 @@ NSString *nsstring_with_string(const godot::String& string);
 godot::Variant to_variant(NSObject *obj);
 godot::Variant to_variant(NSString *string);
 godot::Variant to_variant(NSNumber *number);
-godot::Variant invoke(id obj, SEL sel);
+godot::Variant invoke(id obj, SEL sel, const godot::Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 
 }
 

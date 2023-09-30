@@ -50,13 +50,14 @@ ObjCObject::~ObjCObject() {
 	}
 }
 
-Variant ObjCObject::perform_selector(const String& selector) {
-	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjCObject is null");
+Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCObject is null");
 
+	String selector(*argv[0]);
 	SEL sel = to_selector(selector);
 	if ([obj respondsToSelector:sel]) {
 		@try {
-			return invoke(obj, sel);
+			return invoke(obj, sel, argv + 1, argc - 1, error);
 		}
 		@catch (NSException *ex) {
 			ERR_FAIL_V_MSG(Variant(), ex.description.UTF8String);
@@ -68,7 +69,10 @@ Variant ObjCObject::perform_selector(const String& selector) {
 }
 
 void ObjCObject::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("perform_selector"), &ObjCObject::perform_selector);
+	{
+		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjCObject::perform_selector, mi);
+	}
 }
 
 bool ObjCObject::_get(const StringName& name, Variant& r_value) {

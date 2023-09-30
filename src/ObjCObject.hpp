@@ -22,8 +22,8 @@
 #ifndef __OBJC_OBJECT_HPP__
 #define __OBJC_OBJECT_HPP__
 
+#include <gdextension_interface.h>
 #include <godot_cpp/classes/ref_counted.hpp>
-#include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
 
@@ -37,7 +37,7 @@ public:
 	ObjCObject(id obj);
 	~ObjCObject();
 
-	Variant perform_selector(const String& selector);
+	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 
 protected:
 	static void _bind_methods();

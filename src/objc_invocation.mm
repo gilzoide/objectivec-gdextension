@@ -24,6 +24,7 @@
 #include "ObjCObject.hpp"
 
 #include <Foundation/Foundation.h>
+#include <objc/NSObject.h>
 #include <objc/objc.h>
 
 #include <godot_cpp/variant/char_string.hpp>
@@ -133,7 +134,7 @@ Variant to_variant(NSInvocation *invoked_invocation) {
 	return (TOut) value;
 }
 
-Variant invoke(id obj, SEL sel) {
+Variant invoke(id obj, SEL sel, const godot::Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
 	NSMethodSignature *signature = [obj methodSignatureForSelector:sel];
 
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
