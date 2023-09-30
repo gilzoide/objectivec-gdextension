@@ -7,9 +7,9 @@ func _initialize():
 	
 	for gdscript in DirAccess.get_files_at(GDSCRIPT_TEST_DIR):
 		var file_name = str(GDSCRIPT_TEST_DIR, "/", gdscript)
-		var obj = load(file_name).new()
-
 		print("> ", gdscript, ":")
+		
+		var obj = load(file_name).new()
 		for method in obj.get_method_list():
 			var method_name = method.name
 			if method_name.begins_with("test"):
