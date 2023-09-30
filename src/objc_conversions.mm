@@ -24,6 +24,7 @@
 #include "ObjCObject.hpp"
 #include "ObjCClass.hpp"
 
+#include <Foundation/Foundation.h>
 #include <objc/runtime.h>
 
 #include <godot_cpp/core/error_macros.hpp>
@@ -62,6 +63,10 @@ Variant to_variant(NSObject *obj) {
 	else if ([obj isKindOfClass:NSNumber.class]) {
 		NSNumber *number = (NSNumber *) obj;
 		return to_variant(number);
+	}
+	else if ([obj isKindOfClass:NSArray.class]) {
+		NSArray *array = (NSArray *) obj;
+		return to_variant(array);
 	}
 	else {
 		return memnew(ObjCObject(obj));
@@ -135,6 +140,14 @@ Variant to_variant(NSNumber *number) {
 	}
 }
 
+Variant to_variant(NSArray *array) {
+	Array variant;
+	for (NSObject *obj in array) {
+		variant.append(to_variant(obj));
+	}
+	return variant;
+}
+
 NSObject *to_nsobject(const Variant& value) {
 	switch (value.get_type()) {
 		case godot::Variant::NIL:
@@ -152,7 +165,10 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::STRING:
 		case godot::Variant::STRING_NAME:
 		case godot::Variant::NODE_PATH:
-			return to_nsstring(value.operator String());
+			return to_nsstring(value);
+
+		case godot::Variant::ARRAY:
+			return to_nsmutablearray(value);
 
 		case godot::Variant::VECTOR2:
 		case godot::Variant::VECTOR2I:
@@ -175,7 +191,6 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::CALLABLE:
 		case godot::Variant::SIGNAL:
 		case godot::Variant::DICTIONARY:
-		case godot::Variant::ARRAY:
 		case godot::Variant::PACKED_BYTE_ARRAY:
 		case godot::Variant::PACKED_INT32_ARRAY:
 		case godot::Variant::PACKED_INT64_ARRAY:
@@ -205,6 +220,14 @@ NSNumber *to_nsnumber(int64_t value) {
 
 NSNumber *to_nsnumber(double value) {
 	return [NSNumber numberWithDouble:value];
+}
+
+NSMutableArray *to_nsmutablearray(const Array& array) {
+	NSMutableArray *mutable_array = [NSMutableArray arrayWithCapacity:array.size()];
+	for (int i = 0; i < array.size(); i++) {
+		[mutable_array addObject:to_nsobject(array[i])];
+	}
+	return mutable_array;
 }
 
 }
