@@ -55,7 +55,7 @@ func _ready():
     # 4. Send messages
     alert.perform_selector("runModal")
 ```
-![Native macOS alert window showing the message text set via GDScript](extras/hello_from_godot.png)
+<img src="extras/hello_from_godot.png" height="256" alt="Native macOS alert window showing the message text set via GDScript" />
 
 
 ## How to install
