@@ -68,11 +68,25 @@ Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, 
 	}
 }
 
+Array ObjCObject::to_array() const {
+	@try {
+		Array array;
+		for (id value in obj) {
+			array.append(to_variant((NSObject *) value));
+		}
+		return array;
+	}
+	@catch (NSException *ex) {
+		ERR_FAIL_V_MSG(Array(), ex.description.UTF8String);
+	}
+}
+
 void ObjCObject::_bind_methods() {
 	{
 		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
 		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjCObject::perform_selector, mi);
 	}
+	ClassDB::bind_method(D_METHOD("to_array"), &ObjCObject::to_array);
 }
 
 bool ObjCObject::_set(const StringName& name, const Variant& value) {

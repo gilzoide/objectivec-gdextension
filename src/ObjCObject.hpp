@@ -40,6 +40,8 @@ public:
 	id get_obj();
 	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 
+	Array to_array() const;
+
 protected:
 	static void _bind_methods();
 
