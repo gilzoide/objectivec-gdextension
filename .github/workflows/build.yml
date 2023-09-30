@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    name: ${{ matrix.platform }} (${{ matrix.arch }}, ${{ matrix.target }})
+    name: ${{ matrix.platform }} (simulator=${{ matrix.simulator }}, ${{ matrix.arch }}, ${{ matrix.target }})
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -18,9 +18,9 @@ jobs:
         arch: [universal]
         platform: [macos, ios]
         simulator: [true, false]
-      exclude:
-        - platform: macos
-          simulator: true
+        exclude:
+          - platform: macos
+            simulator: true
     steps:
       - uses: actions/checkout@v3
         with:
