@@ -33,7 +33,7 @@ NSClass::NSClass() : ObjCObject() {}
 NSClass::NSClass(id obj) : ObjCObject(obj) {}
 
 Variant NSClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
-	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCClass is null");
+	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "NSClass is null");
 	if (argc < 1) {
 		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
 		error.argument = 1;
