@@ -41,6 +41,7 @@ public:
 	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 	bool is_kind_of_class(const String& class_name) const;
 	bool responds_to_selector(const String& selector) const;
+	bool conforms_to_protocol(const String& protocol_name) const;
 
 	Array to_array() const;
 	Dictionary to_dictionary() const;

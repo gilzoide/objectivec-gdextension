@@ -36,6 +36,11 @@ Class class_from_string(const String& string) {
 	return objc_getClass(chars.get_data());
 }
 
+Protocol *protocol_from_string(const String& string) {
+	CharString chars = string.ascii();
+	return objc_getProtocol(chars.get_data());
+}
+
 SEL to_selector(const godot::String& string) {
 	CharString chars = string.ascii();
 	return sel_registerName(chars.get_data());

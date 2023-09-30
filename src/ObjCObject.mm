@@ -80,6 +80,12 @@ bool ObjCObject::responds_to_selector(const String& selector) const {
 	return [obj respondsToSelector:sel];
 }
 
+bool ObjCObject::conforms_to_protocol(const String& protocol_name) const {
+	Protocol *protocol = protocol_from_string(protocol_name);
+	ERR_FAIL_COND_V_MSG(!protocol, false, "Invalid protocol: " + protocol_name);
+	return [obj conformsToProtocol:protocol];
+}
+
 Array ObjCObject::to_array() const {
 	if (!obj) {
 		return Array();
@@ -120,6 +126,7 @@ void ObjCObject::_bind_methods() {
 	}
 	ClassDB::bind_method(D_METHOD("is_kind_of_class", "class_name"), &ObjCObject::is_kind_of_class);
 	ClassDB::bind_method(D_METHOD("responds_to_selector", "selector"), &ObjCObject::responds_to_selector);
+	ClassDB::bind_method(D_METHOD("conforms_to_protocol", "protocol_name"), &ObjCObject::conforms_to_protocol);
 	ClassDB::bind_method(D_METHOD("to_array"), &ObjCObject::to_array);
 	ClassDB::bind_method(D_METHOD("to_dictionary"), &ObjCObject::to_dictionary);
 }
