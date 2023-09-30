@@ -37,7 +37,7 @@ public:
 	ObjCObject(id obj);
 	~ObjCObject();
 
-	Variant invoke(const String& selector);
+	Variant perform_selector(const String& selector);
 
 protected:
 	static void _bind_methods();

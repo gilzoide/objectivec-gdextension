@@ -24,6 +24,9 @@
 #include "ObjCObject.hpp"
 
 #include <Foundation/Foundation.h>
+#include <objc/objc.h>
+
+#include <godot_cpp/variant/char_string.hpp>
 
 using namespace godot;
 
@@ -56,52 +59,70 @@ namespace objcgdextension {
 	^type	A pointer to type
  */
 
+SEL to_selector(const godot::String& string) {
+	CharString chars = string.ascii();
+	return sel_registerName(chars.get_data());
+}
+
+NSString *nsstring_with_string(const godot::String& string) {
+	CharString chars = string.utf8();
+	return [NSString stringWithUTF8String:chars.get_data()];
+}
+
 Variant to_variant(NSObject *obj) {
 	if (obj == nil) {
 		return Variant();
 	}
 	else if ([obj isKindOfClass:NSString.class]) {
 		NSString *string = (NSString *) obj;
-		return [string UTF8String];
+		return to_variant(string);
 	}
 	else if ([obj isKindOfClass:NSNumber.class]) {
 		NSNumber *number = (NSNumber *) obj;
-		switch (number.objCType[0]) {
-			case 'B':
-				return (bool) number.boolValue;
-
-			case 'c':
-			case 'C': {
-				char c = number.charValue;
-				if (c == 0 || c == 1) {
-					return (bool) c;
-				}
-				// fallthrough
-			}
-			case 'i':
-			case 's':
-			case 'l':
-			case 'q':
-				return (int64_t) number.longValue;
-			
-			case 'I':
-			case 'S':
-			case 'L':
-			case 'Q':
-				return (uint64_t) number.unsignedLongValue;
-			
-			case 'f':
-				return number.floatValue;
-
-			case 'd':
-				return number.doubleValue;
-			
-			default:
-				ERR_FAIL_V_EDMSG(Variant(), String("NSNumber objCType '%s' is not valid") % String(number.objCType));
-		}
+		return to_variant(number);
 	}
 	else {
 		return memnew(ObjCObject(obj));
+	}
+}
+
+Variant to_variant(NSString *string) {
+	return [string UTF8String];
+}
+
+Variant to_variant(NSNumber *number) {
+	switch (number.objCType[0]) {
+		case 'B':
+			return (bool) number.boolValue;
+
+		case 'c':
+		case 'C': {
+			char c = number.charValue;
+			if (c == 0 || c == 1) {
+				return (bool) c;
+			}
+			// fallthrough
+		}
+		case 'i':
+		case 's':
+		case 'l':
+		case 'q':
+			return (int64_t) number.longValue;
+		
+		case 'I':
+		case 'S':
+		case 'L':
+		case 'Q':
+			return (uint64_t) number.unsignedLongValue;
+		
+		case 'f':
+			return number.floatValue;
+
+		case 'd':
+			return number.doubleValue;
+		
+		default:
+			ERR_FAIL_V_EDMSG(Variant(), String("NSNumber objCType '%s' is not valid") % String(number.objCType));
 	}
 }
 
@@ -112,7 +133,7 @@ Variant to_variant(NSInvocation *invoked_invocation) {
 	return (TOut) value;
 }
 
-Variant perform_selector(id obj, SEL sel) {
+Variant invoke(id obj, SEL sel) {
 	NSMethodSignature *signature = [obj methodSignatureForSelector:sel];
 
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];

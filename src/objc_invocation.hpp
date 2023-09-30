@@ -22,11 +22,18 @@
 #ifndef __OBJC_INVOCATION_HPP__
 #define __OBJC_INVOCATION_HPP__
 
+#include <Foundation/Foundation.h>
 #include <godot_cpp/variant/variant.hpp>
 
 namespace objcgdextension {
 
-godot::Variant perform_selector(id obj, SEL sel);
+SEL to_selector(const godot::String& string);
+NSString *nsstring_with_string(const godot::String& string);
+
+godot::Variant to_variant(NSObject *obj);
+godot::Variant to_variant(NSString *string);
+godot::Variant to_variant(NSNumber *number);
+godot::Variant invoke(id obj, SEL sel);
 
 }
 
