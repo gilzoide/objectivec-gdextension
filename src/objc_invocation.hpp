@@ -31,13 +31,6 @@ using namespace godot;
 
 namespace objcgdextension {
 
-SEL to_selector(const String& string);
-NSString *nsstring_with_string(const String& string);
-String format_selector_call(id obj, const String& selector);
-
-Variant to_variant(NSObject *obj);
-Variant to_variant(NSString *string);
-Variant to_variant(NSNumber *number);
 Variant invoke(id obj, const String& selector, const Variant **argv, GDExtensionInt argc);
 
 }

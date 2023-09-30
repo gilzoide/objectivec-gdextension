@@ -21,7 +21,7 @@
  */
 #include "ObjCClass.hpp"
 
-#include <objc/runtime.h>
+#include "objc_conversions.hpp"
 
 namespace objcgdextension {
 
@@ -29,8 +29,7 @@ ObjCClass::ObjCClass() : ObjCObject() {}
 ObjCClass::ObjCClass(id obj) : ObjCObject(obj) {}
 
 ObjCClass *ObjCClass::from_string(const String& name) {
-	CharString chars = name.ascii();
-	Class cls = objc_getClass(chars.get_data());
+	Class cls = class_from_string(name);
 	return memnew(ObjCClass(cls));
 }
 

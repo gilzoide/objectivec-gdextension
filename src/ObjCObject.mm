@@ -21,6 +21,7 @@
  */
 #include "ObjCObject.hpp"
 
+#include "objc_conversions.hpp"
 #include "objc_invocation.hpp"
 
 #include <Foundation/Foundation.h>
@@ -49,6 +50,10 @@ ObjCObject::~ObjCObject() {
 	if (obj) {
 		objc_release(obj);
 	}
+}
+
+id ObjCObject::get_obj() {
+	return obj;
 }
 
 Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {

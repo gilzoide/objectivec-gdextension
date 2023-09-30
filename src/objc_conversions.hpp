@@ -19,37 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_OBJECT_HPP__
-#define __OBJC_OBJECT_HPP__
+#ifndef __OBJC_CONVERSIONS_HPP__
+#define __OBJC_CONVERSIONS_HPP__
 
-#include <gdextension_interface.h>
-#include <godot_cpp/classes/ref_counted.hpp>
+#include <Foundation/Foundation.h>
+
+#include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
 
 namespace objcgdextension {
 
-class ObjCObject : public RefCounted {
-	GDCLASS(ObjCObject, RefCounted);
+Class class_from_string(const String& string);
+SEL to_selector(const String& string);
+NSString *nsstring_with_string(const String& string);
+String format_selector_call(id obj, const String& selector);
 
-public:
-	ObjCObject();
-	ObjCObject(id obj);
-	~ObjCObject();
-
-	id get_obj();
-	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-
-protected:
-	static void _bind_methods();
-
-	bool _get(const StringName& name, Variant& r_value);
-
-	String _to_string();
-
-	id obj;
-};
+Variant to_variant(NSObject *obj);
+Variant to_variant(NSString *string);
+Variant to_variant(NSNumber *number);
 
 }
 
-#endif  // __OBJC_OBJECT_HPP__
+#endif  // __OBJC_CONVERSIONS_HPP__

@@ -21,7 +21,9 @@
  */
 #include "objc_invocation.hpp"
 
+#include "ObjCClass.hpp"
 #include "ObjCObject.hpp"
+#include "objc_conversions.hpp"
 
 #include <Foundation/Foundation.h>
 #include <objc/runtime.h>
@@ -59,71 +61,44 @@ namespace objcgdextension {
 	^type	A pointer to type
  */
 
-SEL to_selector(const godot::String& string) {
-	CharString chars = string.ascii();
-	return sel_registerName(chars.get_data());
+template<typename T>
+int set_argument(void *buffer, NSInvocation *invocation, int arg_number, const T& value) {
+	*((T *) buffer) = value;
+	[invocation setArgument:buffer atIndex:arg_number];
+	return sizeof(T);
 }
 
-NSString *nsstring_with_string(const godot::String& string) {
-	CharString chars = string.utf8();
-	return [NSString stringWithUTF8String:chars.get_data()];
-}
-
-Variant to_variant(NSObject *obj) {
-	if (obj == nil) {
-		return Variant();
-	}
-	else if ([obj isKindOfClass:NSString.class]) {
-		NSString *string = (NSString *) obj;
-		return to_variant(string);
-	}
-	else if ([obj isKindOfClass:NSNumber.class]) {
-		NSNumber *number = (NSNumber *) obj;
-		return to_variant(number);
-	}
-	else {
-		return memnew(ObjCObject(obj));
-	}
-}
-
-Variant to_variant(NSString *string) {
-	return [string UTF8String];
-}
-
-Variant to_variant(NSNumber *number) {
-	switch (number.objCType[0]) {
+int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const Variant *value) {
+	const char *type = [invocation.methodSignature getArgumentTypeAtIndex:arg_number];
+	switch (type[0]) {
 		case 'B':
-			return (bool) number.boolValue;
-
 		case 'c':
-		case 'C': {
-			char c = number.charValue;
-			if (c == 0 || c == 1) {
-				return (bool) c;
-			}
-			// fallthrough
-		}
+		case 'C':
 		case 'i':
-		case 's':
-		case 'l':
-		case 'q':
-			return (int64_t) number.longValue;
-		
 		case 'I':
+		case 's':
 		case 'S':
+		case 'l':
 		case 'L':
+		case 'q':
 		case 'Q':
-			return (uint64_t) number.unsignedLongValue;
+			return set_argument(buffer, invocation, arg_number, value->operator int64_t());
 		
-		case 'f':
-			return number.floatValue;
+		case '#': {
+			ObjCObject *obj;
+			if (value->get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjCObject>(value->operator Object*()))) {
+				return set_argument(buffer, invocation, arg_number, obj->get_obj());
+			}
+			else {
+				Class cls = class_from_string(value->operator String());
+				return set_argument(buffer, invocation, arg_number, cls);
+			}
+		}
 
-		case 'd':
-			return number.doubleValue;
-		
 		default:
-			ERR_FAIL_V_EDMSG(Variant(), String("NSNumber objCType '%s' is not valid") % String(number.objCType));
+			ERR_FAIL_V_MSG(0, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(type));
 	}
+	return 0;
 }
 
 template<typename TIn, typename TOut>
@@ -131,14 +106,6 @@ Variant to_variant(NSInvocation *invoked_invocation) {
 	TIn value;
 	[invoked_invocation getReturnValue:&value];
 	return (TOut) value;
-}
-
-String format_selector_call(id obj, const String& selector) {
-	return String("%s[%s %s]") % Array::make(
-		object_isClass(obj) ? "+" : "-",
-		object_getClassName(obj),
-		selector
-	);
 }
 
 Variant invoke(id obj, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
@@ -160,10 +127,15 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
 	invocation.target = obj;
 	invocation.selector = sel;
-	
-	// for (int i = 0; i < args.size(); i++) {}
-	
-	[invocation invoke];
+	{
+		PackedByteArray buffer_holder;
+		buffer_holder.resize(signature.frameLength);
+		uint8_t *buffer = buffer_holder.ptrw();
+		for (int i = 0; i < argc; i++) {
+			buffer += setup_argument(buffer, invocation, i + 2, argv[i]);
+		}
+		[invocation invoke];
+	}
 
 	const char *return_type = signature.methodReturnType;
 	switch (return_type[0]) {
@@ -206,11 +178,17 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 			return to_variant(result);
 		}
 
+		case '#': {
+			Class result;
+			[invocation getReturnValue:&result];
+			return memnew(ObjCClass(result));
+		}
+
 		case 'v':
 			return Variant();
 
 		default:
-			ERR_FAIL_V_EDMSG(Variant(), String("Return value with Objective-C encoded type '%s' is not valid yet") % String(return_type));
+			ERR_FAIL_V_EDMSG(Variant(), String("Return value with Objective-C encoded type '%s' is not supported yet") % String(return_type));
 	}
 }
 
