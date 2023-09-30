@@ -1,0 +1,11 @@
+[configuration]
+
+entry_symbol = "objcgdextension_entrypoint"
+compatibility_minimum = "4.1"
+
+[libraries]
+
+macos.debug = "build/libobjcgdextension.macos.template_debug.universal.dylib"
+macos.release = "build/libobjcgdextension.macos.template_release.universal.dylib"
+ios.debug = "build/libobjcgdextension.ios.template_debug.universal.dylib"
+ios.release = "build/libobjcgdextension.ios.template_release.universal.dylib"
