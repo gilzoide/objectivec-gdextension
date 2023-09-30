@@ -1,5 +1,5 @@
-# ObjC GDExtension
-[![Build and test](https://github.com/gilzoide/objc-gdextension/actions/workflows/build.yml/badge.svg)](https://github.com/gilzoide/objc-gdextension/actions/workflows/build.yml)
+# Objective-C GDExtension
+[![Build and test](https://github.com/gilzoide/objectivec-gdextension/actions/workflows/build.yml/badge.svg)](https://github.com/gilzoide/objectivec-gdextension/actions/workflows/build.yml)
 
 Experimental GDExtension for calling Object-C methods at runtime in Godot 4.1+
 
@@ -9,7 +9,7 @@ Use at your own risk.
 
 ## Features
 - All calls are made using the Objective-C runtime, so that all classes and methods are available
-- Supports macOS and iOS builds, as well as the Godot editor running on macOS
+- Supports macOS, iOS and iOS Simulator builds, as well as the Godot editor running on macOS
 - Uses [Key-Value Coding](https://developer.apple.com/documentation/objectivec/nsobject/nskeyvaluecoding) for getting and setting properties.
   Just use the same property names as in Objective-C and you're good to go.
 - Automatic reference counting of Objective-C objects, since they are wrapped in `RefCounted` subclasses
@@ -30,6 +30,7 @@ Use at your own risk.
 - Currently only supports macOS and iOS.
   In multiplatform projects, you must check if you are in a supported platform before trying to use the API.
 - This plugin makes its best to check for type compatibility between Godot and Objective-C and catch exceptions when sending messages, but it is possible for crashes to happen if the library is misused.
+- For now, there is no support for structs, blocks and pointers in general.
 
 
 ## How to use
