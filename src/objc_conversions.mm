@@ -196,6 +196,16 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::PACKED_BYTE_ARRAY:
 			return to_nsmutabledata(value);
 
+		case godot::Variant::OBJECT: {
+			Object *obj = value;
+			if (ObjCObject *objc_obj = Object::cast_to<ObjCObject>(obj)) {
+				return objc_obj->get_obj();
+			}
+			else {
+				ERR_FAIL_V_MSG(nil, String("Conversion from '%s' to NSObject* is not supported yet.") % obj->get_class());
+			}
+		}
+
 		case godot::Variant::VECTOR2:
 		case godot::Variant::VECTOR2I:
 		case godot::Variant::RECT2:
@@ -213,7 +223,6 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::PROJECTION:
 		case godot::Variant::COLOR:
 		case godot::Variant::RID:
-		case godot::Variant::OBJECT:
 		case godot::Variant::CALLABLE:
 		case godot::Variant::SIGNAL:
 		case godot::Variant::PACKED_INT32_ARRAY:
