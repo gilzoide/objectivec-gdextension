@@ -30,16 +30,13 @@
 #include <gdextension_interface.h>
 #include <godot_cpp/core/error_macros.hpp>
 
-extern "C" id objc_retain(id);
-extern "C" void objc_release(id);
-
 namespace objcgdextension {
 
 ObjCObject::ObjCObject() : obj() {}
 
 ObjCObject::ObjCObject(id obj) {
 	if (obj) {
-		this->obj = objc_retain(obj);
+		this->obj = [obj retain];
 	}
 	else {
 		obj = nil;
@@ -48,7 +45,7 @@ ObjCObject::ObjCObject(id obj) {
 
 ObjCObject::~ObjCObject() {
 	if (obj) {
-		objc_release(obj);
+		[obj release];
 	}
 }
 

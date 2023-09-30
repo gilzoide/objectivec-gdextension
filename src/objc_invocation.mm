@@ -149,60 +149,61 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 			buffer += setup_argument(buffer, invocation, i + 2, *argv[i]);
 		}
 		[invocation invoke];
-	}
 
-	const char *return_type = signature.methodReturnType;
-	switch (return_type[0]) {
-		case 'B':
-			return to_variant<bool, bool>(invocation);
+		const char *return_type = signature.methodReturnType;
+		switch (return_type[0]) {
+			case 'B':
+				return to_variant<bool, bool>(invocation);
 
-		case 'c': {
-			char c;
-			[invocation getReturnValue:&c];
-			if (c == 0 || c == 1) {
-				return (bool) c;
+			case 'c': {
+				char c;
+				[invocation getReturnValue:&c];
+				if (c == 0 || c == 1) {
+					return (bool) c;
+				}
+				else {
+					return String::utf8(&c, 1);
+				}
 			}
-			else {
-				return String::utf8(&c, 1);
+			case 'i':
+				return to_variant<int, int64_t>(invocation);
+			case 's':
+				return to_variant<short, int64_t>(invocation);
+			case 'l':
+				return to_variant<long, int64_t>(invocation);
+			case 'q':
+				return to_variant<long long, int64_t>(invocation);
+
+			case 'C':
+				return to_variant<unsigned char, int64_t>(invocation);
+			case 'I':
+				return to_variant<unsigned int, uint64_t>(invocation);
+			case 'S':
+				return to_variant<unsigned short, uint64_t>(invocation);
+			case 'L':
+				return to_variant<unsigned long, uint64_t>(invocation);
+			case 'Q':
+				return to_variant<unsigned long long, uint64_t>(invocation);
+			
+			case '@': {
+				id result;
+				[invocation getReturnValue:&result];
+				[result retain];
+				return to_variant((NSObject *) result);
 			}
+
+			case '#': {
+				Class result;
+				[invocation getReturnValue:&result];
+				return memnew(ObjCClass(result));
+			}
+
+			case 'v':
+				return Variant();
+
+			default:
+				ERR_FAIL_V_EDMSG(Variant(), String("Return value with Objective-C encoded type '%s' is not supported yet") % String(return_type));
 		}
-		case 'i':
-			return to_variant<int, int64_t>(invocation);
-		case 's':
-			return to_variant<short, int64_t>(invocation);
-		case 'l':
-			return to_variant<long, int64_t>(invocation);
-		case 'q':
-			return to_variant<long long, int64_t>(invocation);
-
-		case 'C':
-			return to_variant<unsigned char, int64_t>(invocation);
-		case 'I':
-			return to_variant<unsigned int, uint64_t>(invocation);
-		case 'S':
-			return to_variant<unsigned short, uint64_t>(invocation);
-		case 'L':
-			return to_variant<unsigned long, uint64_t>(invocation);
-		case 'Q':
-			return to_variant<unsigned long long, uint64_t>(invocation);
-		
-		case '@': {
-			NSObject *result;
-			[invocation getReturnValue:&result];
-			return to_variant(result);
-		}
-
-		case '#': {
-			Class result;
-			[invocation getReturnValue:&result];
-			return memnew(ObjCClass(result));
-		}
-
-		case 'v':
-			return Variant();
-
-		default:
-			ERR_FAIL_V_EDMSG(Variant(), String("Return value with Objective-C encoded type '%s' is not supported yet") % String(return_type));
 	}
 }
 

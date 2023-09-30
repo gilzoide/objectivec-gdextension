@@ -69,7 +69,7 @@ Variant to_variant(NSObject *obj) {
 }
 
 Variant to_variant(NSString *string) {
-	return [string UTF8String];
+	return string.UTF8String;
 }
 
 /**
