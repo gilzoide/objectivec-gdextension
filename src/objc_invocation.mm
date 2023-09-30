@@ -84,6 +84,10 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		case 'Q':
 			return set_argument(buffer, invocation, arg_number, value->operator int64_t());
 		
+		case 'f':
+		case 'd':
+			return set_argument(buffer, invocation, arg_number, value->operator double());
+		
 		case '#': {
 			ObjCObject *obj;
 			if (value->get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjCObject>(value->operator Object*()))) {
