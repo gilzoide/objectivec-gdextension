@@ -22,11 +22,33 @@
 #include "ObjCClass.hpp"
 
 #include "objc_conversions.hpp"
+#include "objc_invocation.hpp"
+
+#include <godot_cpp/core/error_macros.hpp>
 
 namespace objcgdextension {
 
 ObjCClass::ObjCClass() : ObjCObject() {}
+
 ObjCClass::ObjCClass(id obj) : ObjCObject(obj) {}
+
+Variant ObjCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCClass is null");
+	if (argc < 1) {
+		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
+		error.argument = 1;
+		return Variant();
+	}
+
+	String initSelector = *argv[0];
+	ERR_FAIL_COND_V_MSG(
+		!initSelector.begins_with("init"),
+		Variant(),
+		String("Expected initializer selector to begin with 'init': got '%s'") % initSelector
+	);
+
+	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
+}
 
 ObjCClass *ObjCClass::from_string(const String& name) {
 	Class cls = class_from_string(name);
@@ -34,6 +56,10 @@ ObjCClass *ObjCClass::from_string(const String& name) {
 }
 
 void ObjCClass::_bind_methods() {
+	{
+		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjCClass::alloc, mi);
+	}
 	ClassDB::bind_static_method("ObjCClass", D_METHOD("from_string", "name"), &ObjCClass::from_string);
 }
 

@@ -35,6 +35,7 @@ public:
 	ObjCClass();
 	ObjCClass(id obj);
 
+	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 	static ObjCClass *from_string(const String& name);
 
 protected:
