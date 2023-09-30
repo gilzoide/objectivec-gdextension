@@ -55,7 +55,7 @@ String format_selector_call(id obj, const String& selector) {
 }
 
 Variant to_variant(NSObject *obj) {
-	if (obj == nil) {
+	if (obj == nil || obj == NSNull.null) {
 		return Variant();
 	}
 	else if (object_isClass(obj)) {
