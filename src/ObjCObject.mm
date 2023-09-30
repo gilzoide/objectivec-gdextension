@@ -26,6 +26,7 @@
 #include <Foundation/Foundation.h>
 #include <objc/runtime.h>
 
+#include <gdextension_interface.h>
 #include <godot_cpp/core/error_macros.hpp>
 
 extern "C" id objc_retain(id);
@@ -52,19 +53,16 @@ ObjCObject::~ObjCObject() {
 
 Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
 	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCObject is null");
-
-	String selector(*argv[0]);
-	SEL sel = to_selector(selector);
-	if ([obj respondsToSelector:sel]) {
-		@try {
-			return invoke(obj, sel, argv + 1, argc - 1, error);
-		}
-		@catch (NSException *ex) {
-			ERR_FAIL_V_MSG(Variant(), ex.description.UTF8String);
-		}
+	if (argc < 1) {
+		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
+		error.argument = 1;
+		return Variant();
 	}
-	else {
-		ERR_FAIL_V_EDMSG(Variant(), String("%s does not respond to selector '%s'") % Array::make(class_getName([obj class]), selector));
+	@try {
+		return invoke(obj, String(*argv[0]), argv + 1, argc - 1);
+	}
+	@catch (NSException *ex) {
+		ERR_FAIL_V_MSG(Variant(), ex.description.UTF8String);
 	}
 }
 

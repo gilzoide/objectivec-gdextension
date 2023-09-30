@@ -24,12 +24,11 @@
 #include "ObjCObject.hpp"
 
 #include <Foundation/Foundation.h>
-#include <objc/NSObject.h>
-#include <objc/objc.h>
+#include <objc/runtime.h>
 
+#include <gdextension_interface.h>
+#include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/variant/char_string.hpp>
-
-using namespace godot;
 
 namespace objcgdextension {
 
@@ -134,13 +133,36 @@ Variant to_variant(NSInvocation *invoked_invocation) {
 	return (TOut) value;
 }
 
-Variant invoke(id obj, SEL sel, const godot::Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+String format_selector_call(id obj, const String& selector) {
+	return String("%s[%s %s]") % Array::make(
+		object_isClass(obj) ? "+" : "-",
+		object_getClassName(obj),
+		selector
+	);
+}
+
+Variant invoke(id obj, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
+	SEL sel = to_selector(selector);
+	ERR_FAIL_COND_V_EDMSG(
+		![obj respondsToSelector:sel],
+		Variant(),
+		String("Invalid call to %s: selector not supported") % format_selector_call(obj, selector)
+	);
+
 	NSMethodSignature *signature = [obj methodSignatureForSelector:sel];
+	int expected_argc = signature.numberOfArguments - 2;
+	ERR_FAIL_COND_V_MSG(
+		expected_argc != argc,
+		Variant(),
+		String("Invalid call to %s: expected %d arguments, found %d") % Array::make(format_selector_call(obj, selector), expected_argc, argc)
+	);
 
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
 	invocation.target = obj;
 	invocation.selector = sel;
-	// TODO: pass arguments
+	
+	// for (int i = 0; i < args.size(); i++) {}
+	
 	[invocation invoke];
 
 	const char *return_type = signature.methodReturnType;
@@ -188,7 +210,7 @@ Variant invoke(id obj, SEL sel, const godot::Variant **argv, GDExtensionInt argc
 			return Variant();
 
 		default:
-			ERR_FAIL_V_EDMSG(Variant(), String("Return value '%s' is not valid yet") % String(return_type));
+			ERR_FAIL_V_EDMSG(Variant(), String("Return value with Objective-C encoded type '%s' is not valid yet") % String(return_type));
 	}
 }
 

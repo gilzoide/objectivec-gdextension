@@ -27,15 +27,18 @@
 #include <gdextension_interface.h>
 #include <godot_cpp/variant/variant.hpp>
 
+using namespace godot;
+
 namespace objcgdextension {
 
-SEL to_selector(const godot::String& string);
-NSString *nsstring_with_string(const godot::String& string);
+SEL to_selector(const String& string);
+NSString *nsstring_with_string(const String& string);
+String format_selector_call(id obj, const String& selector);
 
-godot::Variant to_variant(NSObject *obj);
-godot::Variant to_variant(NSString *string);
-godot::Variant to_variant(NSNumber *number);
-godot::Variant invoke(id obj, SEL sel, const godot::Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
+Variant to_variant(NSObject *obj);
+Variant to_variant(NSString *string);
+Variant to_variant(NSNumber *number);
+Variant invoke(id obj, const String& selector, const Variant **argv, GDExtensionInt argc);
 
 }
 
