@@ -74,6 +74,12 @@ bool ObjCObject::is_kind_of_class(const String& class_name) const {
 	return [obj isKindOfClass:cls];
 }
 
+bool ObjCObject::responds_to_selector(const String& selector) const {
+	SEL sel = to_selector(selector);
+	ERR_FAIL_COND_V_MSG(!sel, false, "Invalid selector: " + selector);
+	return [obj respondsToSelector:sel];
+}
+
 Array ObjCObject::to_array() const {
 	if (!obj) {
 		return Array();
@@ -112,7 +118,8 @@ void ObjCObject::_bind_methods() {
 		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
 		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjCObject::perform_selector, mi);
 	}
-	ClassDB::bind_method(D_METHOD("is_kind_of_class"), &ObjCObject::is_kind_of_class);
+	ClassDB::bind_method(D_METHOD("is_kind_of_class", "class_name"), &ObjCObject::is_kind_of_class);
+	ClassDB::bind_method(D_METHOD("responds_to_selector", "selector"), &ObjCObject::responds_to_selector);
 	ClassDB::bind_method(D_METHOD("to_array"), &ObjCObject::to_array);
 	ClassDB::bind_method(D_METHOD("to_dictionary"), &ObjCObject::to_dictionary);
 }

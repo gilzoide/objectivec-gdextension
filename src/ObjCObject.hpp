@@ -39,7 +39,8 @@ public:
 
 	id get_obj();
 	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-	bool is_kind_of_class(const String& cls) const;
+	bool is_kind_of_class(const String& class_name) const;
+	bool responds_to_selector(const String& selector) const;
 
 	Array to_array() const;
 	Dictionary to_dictionary() const;
