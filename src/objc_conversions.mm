@@ -59,7 +59,7 @@ Variant to_variant(NSObject *obj) {
 		return Variant();
 	}
 	else if (object_isClass(obj)) {
-		return memnew(ObjCClass(obj));
+		return memnew(NSClass(obj));
 	}
 	else if ([obj isKindOfClass:NSString.class]) {
 		NSString *string = (NSString *) obj;

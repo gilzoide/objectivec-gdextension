@@ -195,7 +195,7 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 			case '#': {
 				Class result;
 				[invocation getReturnValue:&result];
-				return memnew(ObjCClass(result));
+				return memnew(NSClass(result));
 			}
 
 			case 'v':

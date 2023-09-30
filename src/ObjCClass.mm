@@ -28,11 +28,11 @@
 
 namespace objcgdextension {
 
-ObjCClass::ObjCClass() : ObjCObject() {}
+NSClass::NSClass() : ObjCObject() {}
 
-ObjCClass::ObjCClass(id obj) : ObjCObject(obj) {}
+NSClass::NSClass(id obj) : ObjCObject(obj) {}
 
-Variant ObjCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+Variant NSClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
 	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCClass is null");
 	if (argc < 1) {
 		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
@@ -50,22 +50,22 @@ Variant ObjCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionC
 	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
 }
 
-ObjCClass *ObjCClass::from_string(const String& name) {
+NSClass *NSClass::from_string(const String& name) {
 	Class cls = class_from_string(name);
 	if (cls) {
-		return memnew(ObjCClass(cls));
+		return memnew(NSClass(cls));
 	}
 	else {
 		return nullptr;
 	}
 }
 
-void ObjCClass::_bind_methods() {
+void NSClass::_bind_methods() {
 	{
 		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
-		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjCClass::alloc, mi);
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &NSClass::alloc, mi);
 	}
-	ClassDB::bind_static_method("ObjCClass", D_METHOD("from_string", "name"), &ObjCClass::from_string);
+	ClassDB::bind_static_method("NSClass", D_METHOD("from_string", "name"), &NSClass::from_string);
 }
 
 }

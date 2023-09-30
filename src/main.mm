@@ -34,7 +34,7 @@ static void initialize(ModuleInitializationLevel level) {
 	}
 
 	ClassDB::register_abstract_class<ObjCObject>();
-	ClassDB::register_abstract_class<ObjCClass>();
+	ClassDB::register_abstract_class<NSClass>();
 }
 
 extern "C" GDExtensionBool objcgdextension_entrypoint(
