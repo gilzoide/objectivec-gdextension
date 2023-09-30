@@ -69,6 +69,9 @@ Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, 
 }
 
 Array ObjCObject::to_array() const {
+	if (!obj) {
+		return Array();
+	}
 	@try {
 		Array array;
 		for (id value in obj) {
@@ -81,12 +84,30 @@ Array ObjCObject::to_array() const {
 	}
 }
 
+Dictionary ObjCObject::to_dictionary() const {
+	if (!obj) {
+		return Dictionary();
+	}
+	@try {
+		Dictionary dictionary;
+		for (id key in obj) {
+			id value = [obj objectForKey:key];
+			dictionary[to_variant((NSObject *) key)] = to_variant((NSObject *) value);
+		}
+		return dictionary;
+	}
+	@catch (NSException *ex) {
+		ERR_FAIL_V_MSG(Dictionary(), ex.description.UTF8String);
+	}
+}
+
 void ObjCObject::_bind_methods() {
 	{
 		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
 		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjCObject::perform_selector, mi);
 	}
 	ClassDB::bind_method(D_METHOD("to_array"), &ObjCObject::to_array);
+	ClassDB::bind_method(D_METHOD("to_dictionary"), &ObjCObject::to_dictionary);
 }
 
 bool ObjCObject::_set(const StringName& name, const Variant& value) {

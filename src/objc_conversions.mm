@@ -64,10 +64,6 @@ Variant to_variant(NSObject *obj) {
 		NSNumber *number = (NSNumber *) obj;
 		return to_variant(number);
 	}
-	else if ([obj isKindOfClass:NSDictionary.class]) {
-		NSDictionary *dictionary = (NSDictionary *) obj;
-		return to_variant(dictionary);
-	}
 	else if ([obj isKindOfClass:NSData.class]) {
 		NSData *data = (NSData *) obj;
 		return to_variant(data);
