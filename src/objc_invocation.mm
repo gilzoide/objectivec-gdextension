@@ -88,6 +88,11 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		case 'd':
 			return set_argument(buffer, invocation, arg_number, value->operator double());
 		
+		case ':': {
+			SEL sel = to_selector(value->operator String());
+			return set_argument(buffer, invocation, arg_number, sel);
+		}
+			
 		case '#': {
 			ObjCObject *obj;
 			if (value->get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjCObject>(value->operator Object*()))) {
