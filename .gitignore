@@ -16,3 +16,9 @@ build/*
 *.dylib
 *.framework
 compile_commands.json
+addons/objectivec-gdextension/LICENSE
+
+# Test project files
+.godot/
+test/godot
+app_userdata/
