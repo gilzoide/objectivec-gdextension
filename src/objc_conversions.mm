@@ -68,6 +68,10 @@ Variant to_variant(NSObject *obj) {
 		NSArray *array = (NSArray *) obj;
 		return to_variant(array);
 	}
+	else if ([obj isKindOfClass:NSDictionary.class]) {
+		NSDictionary *dictionary = (NSDictionary *) obj;
+		return to_variant(dictionary);
+	}
 	else {
 		return memnew(ObjCObject(obj));
 	}
@@ -148,6 +152,14 @@ Variant to_variant(NSArray *array) {
 	return variant;
 }
 
+Variant to_variant(NSDictionary *dictionary) {
+	Dictionary variant;
+	for (NSObject *key in dictionary) {
+		variant[to_variant(key)] = to_variant((NSObject *) [dictionary objectForKey:key]);
+	}
+	return variant;
+}
+
 NSObject *to_nsobject(const Variant& value) {
 	switch (value.get_type()) {
 		case godot::Variant::NIL:
@@ -170,6 +182,9 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::ARRAY:
 			return to_nsmutablearray(value);
 
+		case godot::Variant::DICTIONARY:
+			return to_nsmutabledictionary(value);
+
 		case godot::Variant::VECTOR2:
 		case godot::Variant::VECTOR2I:
 		case godot::Variant::RECT2:
@@ -190,7 +205,6 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::OBJECT:
 		case godot::Variant::CALLABLE:
 		case godot::Variant::SIGNAL:
-		case godot::Variant::DICTIONARY:
 		case godot::Variant::PACKED_BYTE_ARRAY:
 		case godot::Variant::PACKED_INT32_ARRAY:
 		case godot::Variant::PACKED_INT64_ARRAY:
@@ -228,6 +242,17 @@ NSMutableArray *to_nsmutablearray(const Array& array) {
 		[mutable_array addObject:to_nsobject(array[i])];
 	}
 	return mutable_array;
+}
+
+NSMutableDictionary *to_nsmutabledictionary(const Dictionary& dictionary) {
+	NSMutableDictionary<NSObject *, NSObject *> *mutable_dictionary = [NSMutableDictionary dictionaryWithCapacity:dictionary.size()];
+	Array keys = dictionary.keys();
+	for (int i = 0; i < keys.size(); i++) {
+		Variant key = keys[i];
+		Variant value = dictionary[key];
+		[mutable_dictionary setObject:to_nsobject(value) forKey:(id<NSCopying>)to_nsobject(key)];
+	}
+	return mutable_dictionary;
 }
 
 }
