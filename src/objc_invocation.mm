@@ -21,7 +21,7 @@
  */
 #include "objc_invocation.hpp"
 
-#include "ObjCClass.hpp"
+#include "NSClass.hpp"
 #include "ObjCObject.hpp"
 #include "objc_conversions.hpp"
 

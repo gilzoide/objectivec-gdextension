@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjCClass.hpp"
+#include "NSClass.hpp"
 #include "ObjCObject.hpp"
 
 #include <godot_cpp/godot.hpp>
