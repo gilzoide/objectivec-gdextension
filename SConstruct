@@ -23,6 +23,9 @@ else:  # build library
     compiledb = env.CompilationDatabase("compile_commands.json")
     env.Alias("compiledb", compiledb)
 
+    # Compile flags
+    env.Append(LINKFLAGS="-framework Foundation")
+
     # Compile with debugging symbols
     if ARGUMENTS.get("debugging_symbols") == 'true':
         if "-O2" in env["CCFLAGS"]:
