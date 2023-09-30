@@ -3,7 +3,7 @@
 
 Experimental GDExtension for calling Object-C methods at runtime in Godot 4.1+
 
-**Warning**: passing the wrong data types to methods may crash the Godot editor and built projects.
+**Warning**: misusage may crash the Godot editor and built projects.
 Use at your own risk.
 
 
@@ -22,6 +22,13 @@ Use at your own risk.
   + `NSNumber` -> `bool`, `int` or `float`
 - `to_array` method for converting Objective-C objects that conform to `NSFastEnumeration` protocol, like `NSArray` and `NSSet`
 - `to_dictionary` method for converting Objective-C objects that conform to `NSFastEnumeration` protocol and support `objectForKey:` message, like `NSDictionary`
+- Other useful methods, like `is_kind_of_class`, `responds_to_selector` and `conforms_to_protocol`
+
+
+## Caveats
+- Currently only supports macOS and iOS.
+  In multiplatform projects, you must check if you are in a supported platform before trying to use the API.
+- This plugin makes its best to check for type compatibility between Godot and Objective-C and catch exceptions when sending messages, but it is possible for crashes to happen if the library is misused.
 
 
 ## How to use
@@ -49,3 +56,12 @@ func _ready():
     alert.perform_selector("runModal")
 ```
 ![Native macOS alert window showing the message text set via GDScript](extras/hello_from_godot.png)
+
+
+## How to install
+1. Go to the [Actions](https://github.com/gilzoide/objc-gdextension/actions) tab
+2. Open the last successful build, or another successful one that targets the branch/commit you want to use
+3. Download the "objc-gdextension" artifact
+4. Extract it into your project
+5. Open the Godot editor at least once after installing the extension
+6. Enjoy 🍾
