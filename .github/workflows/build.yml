@@ -1,0 +1,105 @@
+name: Build and test
+on: [push, pull_request]
+defaults:
+  run:
+    shell: bash
+
+env:
+  SCONS_CACHE: ${{ github.workspace }}/.scons-cache
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} (${{ matrix.arch }}, ${{ matrix.target }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release]
+        arch: [universal]
+        platform: [macos, ios]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install dependencies
+        run: |
+          brew install scons
+      - name: Cache SCons files and compiled files
+        uses: actions/cache@v3
+        with:
+          path: .scons-cache/
+          key: ${{ matrix.platform }}-${{ matrix.arch }}-${{ matrix.target }}
+      - name: Build artifact
+        run: |
+          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=${{ matrix.target }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.arch }}-${{ matrix.target }}
+          path: |
+            addons/objc-gdextension/build/libobjcgdextension.*
+
+  test_distribution:
+    name: Test ${{ matrix.name }}
+    needs: [build]
+    runs-on: ${{ matrix.runner-os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            runner-os: macos-latest
+            godot-release: 4.1.1-stable/Godot_v4.1.1-stable_macos.universal.zip
+            godot-bin: ./Godot.app/Contents/MacOS/Godot
+    env:
+      GODOT_BIN: ${{ matrix.godot-bin }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download artifacts
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: Copy artifacts to build folder
+        run: cp -r '${{ steps.download.outputs.download-path }}'/**/libobjcgdextension* addons/objc-gdextension/build
+        env:
+          MSYS_NO_PATHCONV: 1
+      - name: Download Godot
+        run: |
+          curl --location https://github.com/godotengine/godot/releases/download/${{ matrix.godot-release }} --output godot.zip
+          unzip godot.zip
+      # Must run Godot editor at least once to generate .godot folder
+      - name: Generate .godot folder
+        run: |
+          $GODOT_BIN --headless --quit --path test --editor
+        continue-on-error: true
+      # Now run the tests
+      - name: Run tests
+        run: |
+          $GODOT_BIN --headless --quit --path test --script test_entrypoint.gd
+
+  build_distribution_zip:
+    name: Build distribution zip
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Download artifacts
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: Copy artifacts to build folder
+        run: cp -r ${{ steps.download.outputs.download-path }}/**/libobjcgdextension* addons/objc-gdextension/build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: objc-gdextension
+          path: |
+            LICENSE
+            addons/objc-gdextension/LICENSE
+            addons/objc-gdextension/*.gdextension
+            addons/objc-gdextension/build/libobjcgdextension*
+
