@@ -17,3 +17,16 @@ func test_class_name() -> bool:
 	var NSObject = ObjCClass.from_string("NSObject")
 	assert(str(NSObject) == "NSObject")
 	return true
+
+
+func test_class_get_value() -> bool:
+	var NSObject = ObjCClass.from_string("NSObject")
+	assert(NSObject.description == "NSObject")
+	return true
+
+
+func test_class_set_value() -> bool:
+	var NSObject = ObjCClass.from_string("NSObject")
+	NSObject.version = 3
+	assert(NSObject.version == 3)
+	return true
