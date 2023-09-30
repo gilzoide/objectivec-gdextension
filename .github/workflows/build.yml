@@ -17,6 +17,10 @@ jobs:
         target: [template_debug, template_release]
         arch: [universal]
         platform: [macos, ios]
+        simulator: [true, false]
+      exclude:
+        - platform: macos
+          simulator: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -28,10 +32,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .scons-cache/
-          key: ${{ matrix.platform }}-${{ matrix.arch }}-${{ matrix.target }}
+          key: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}
       - name: Build artifact
         run: |
-          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=${{ matrix.target }}
+          scons platform=${{ matrix.platform }} ios_simulator=${{ matrix.simulator }} arch=${{ matrix.arch }} target=${{ matrix.target }}
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
