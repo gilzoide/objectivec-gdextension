@@ -52,7 +52,12 @@ Variant ObjCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionC
 
 ObjCClass *ObjCClass::from_string(const String& name) {
 	Class cls = class_from_string(name);
-	return memnew(ObjCClass(cls));
+	if (cls) {
+		return memnew(ObjCClass(cls));
+	}
+	else {
+		return nullptr;
+	}
 }
 
 void ObjCClass::_bind_methods() {
