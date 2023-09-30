@@ -75,6 +75,19 @@ void ObjCObject::_bind_methods() {
 	}
 }
 
+bool ObjCObject::_set(const StringName& name, const Variant& value) {
+	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjCObject is null");
+
+	@try {
+		NSString *key = to_nsstring(name);
+		[obj setValue:to_nsobject(value) forKey:key];
+		return true;
+	}
+	@catch (NSException *ex) {
+		ERR_FAIL_V_MSG(false, ex.description.UTF8String);
+	}
+}
+
 bool ObjCObject::_get(const StringName& name, Variant& r_value) {
 	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjCObject is null");
 

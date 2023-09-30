@@ -43,6 +43,7 @@ public:
 protected:
 	static void _bind_methods();
 
+	bool _set(const StringName& name, const Variant& value);
 	bool _get(const StringName& name, Variant& r_value);
 
 	String _to_string();
