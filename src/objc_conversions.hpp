@@ -32,12 +32,17 @@ namespace objcgdextension {
 
 Class class_from_string(const String& string);
 SEL to_selector(const String& string);
-NSString *nsstring_with_string(const String& string);
 String format_selector_call(id obj, const String& selector);
 
 Variant to_variant(NSObject *obj);
 Variant to_variant(NSString *string);
 Variant to_variant(NSNumber *number);
+
+NSObject *to_nsobject(const Variant& value);
+NSString *to_nsstring(const String& string);
+NSNumber *to_nsnumber(bool value);
+NSNumber *to_nsnumber(int64_t value);
+NSNumber *to_nsnumber(double value);
 
 }
 

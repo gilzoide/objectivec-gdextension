@@ -82,7 +82,7 @@ bool ObjCObject::_get(const StringName& name, Variant& r_value) {
 	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjCObject is null");
 
 	@try {
-		NSString *key = nsstring_with_string(name);
+		NSString *key = to_nsstring(name);
 		r_value = to_variant((NSObject *) [obj valueForKey:key]);
 		return true;
 	}

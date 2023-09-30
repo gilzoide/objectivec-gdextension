@@ -26,6 +26,8 @@
 
 #include <objc/runtime.h>
 
+#include <godot_cpp/core/error_macros.hpp>
+
 namespace objcgdextension {
 
 Class class_from_string(const String& string) {
@@ -36,11 +38,6 @@ Class class_from_string(const String& string) {
 SEL to_selector(const godot::String& string) {
 	CharString chars = string.ascii();
 	return sel_registerName(chars.get_data());
-}
-
-NSString *nsstring_with_string(const godot::String& string) {
-	CharString chars = string.utf8();
-	return [NSString stringWithUTF8String:chars.get_data()];
 }
 
 String format_selector_call(id obj, const String& selector) {
@@ -136,6 +133,78 @@ Variant to_variant(NSNumber *number) {
 		default:
 			ERR_FAIL_V_EDMSG(Variant(), String("NSNumber objCType '%s' is not valid") % String(number.objCType));
 	}
+}
+
+NSObject *to_nsobject(const Variant& value) {
+	switch (value.get_type()) {
+		case godot::Variant::NIL:
+			return nil;
+
+		case godot::Variant::BOOL:
+			return to_nsnumber(value.operator bool());
+
+		case godot::Variant::INT:
+			return to_nsnumber(value.operator int64_t());
+
+		case godot::Variant::FLOAT:
+			return to_nsnumber(value.operator double());
+
+		case godot::Variant::STRING:
+		case godot::Variant::STRING_NAME:
+		case godot::Variant::NODE_PATH:
+			return to_nsstring(value.operator String());
+
+		case godot::Variant::VECTOR2:
+		case godot::Variant::VECTOR2I:
+		case godot::Variant::RECT2:
+		case godot::Variant::RECT2I:
+		case godot::Variant::VECTOR3:
+		case godot::Variant::VECTOR3I:
+		case godot::Variant::TRANSFORM2D:
+		case godot::Variant::VECTOR4:
+		case godot::Variant::VECTOR4I:
+		case godot::Variant::PLANE:
+		case godot::Variant::QUATERNION:
+		case godot::Variant::AABB:
+		case godot::Variant::BASIS:
+		case godot::Variant::TRANSFORM3D:
+		case godot::Variant::PROJECTION:
+		case godot::Variant::COLOR:
+		case godot::Variant::RID:
+		case godot::Variant::OBJECT:
+		case godot::Variant::CALLABLE:
+		case godot::Variant::SIGNAL:
+		case godot::Variant::DICTIONARY:
+		case godot::Variant::ARRAY:
+		case godot::Variant::PACKED_BYTE_ARRAY:
+		case godot::Variant::PACKED_INT32_ARRAY:
+		case godot::Variant::PACKED_INT64_ARRAY:
+		case godot::Variant::PACKED_FLOAT32_ARRAY:
+		case godot::Variant::PACKED_FLOAT64_ARRAY:
+		case godot::Variant::PACKED_STRING_ARRAY:
+		case godot::Variant::PACKED_VECTOR2_ARRAY:
+		case godot::Variant::PACKED_VECTOR3_ARRAY:
+		case godot::Variant::PACKED_COLOR_ARRAY:
+		default:
+			ERR_FAIL_V_MSG(nil, String("Conversion from '%s' to NSObject* is not supported yet.") % Variant::get_type_name(value.get_type()));
+	}
+}
+
+NSString *to_nsstring(const godot::String& string) {
+	CharString chars = string.utf8();
+	return [NSString stringWithUTF8String:chars.get_data()];
+}
+
+NSNumber *to_nsnumber(bool value) {
+	return [NSNumber numberWithBool:value];
+}
+
+NSNumber *to_nsnumber(int64_t value) {
+	return [NSNumber numberWithInteger:value];
+}
+
+NSNumber *to_nsnumber(double value) {
+	return [NSNumber numberWithDouble:value];
 }
 
 }

@@ -68,7 +68,7 @@ int set_argument(void *buffer, NSInvocation *invocation, int arg_number, const T
 	return sizeof(T);
 }
 
-int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const Variant *value) {
+int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const Variant& value) {
 	const char *type = [invocation.methodSignature getArgumentTypeAtIndex:arg_number];
 	switch (type[0]) {
 		case 'B':
@@ -82,24 +82,29 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		case 'L':
 		case 'q':
 		case 'Q':
-			return set_argument(buffer, invocation, arg_number, value->operator int64_t());
+			return set_argument(buffer, invocation, arg_number, value.operator int64_t());
 		
 		case 'f':
 		case 'd':
-			return set_argument(buffer, invocation, arg_number, value->operator double());
+			return set_argument(buffer, invocation, arg_number, value.operator double());
 		
 		case ':': {
-			SEL sel = to_selector(value->operator String());
+			SEL sel = to_selector(value.operator String());
 			return set_argument(buffer, invocation, arg_number, sel);
+		}
+
+		case '@': {
+			NSObject *obj = to_nsobject(value);
+			return set_argument(buffer, invocation, arg_number, obj);
 		}
 			
 		case '#': {
 			ObjCObject *obj;
-			if (value->get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjCObject>(value->operator Object*()))) {
+			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjCObject>(value.operator Object*()))) {
 				return set_argument(buffer, invocation, arg_number, obj->get_obj());
 			}
 			else {
-				Class cls = class_from_string(value->operator String());
+				Class cls = class_from_string(value.operator String());
 				return set_argument(buffer, invocation, arg_number, cls);
 			}
 		}
@@ -136,12 +141,12 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
 	invocation.target = obj;
 	invocation.selector = sel;
-	{
+	@autoreleasepool {
 		PackedByteArray buffer_holder;
 		buffer_holder.resize(signature.frameLength);
 		uint8_t *buffer = buffer_holder.ptrw();
 		for (int i = 0; i < argc; i++) {
-			buffer += setup_argument(buffer, invocation, i + 2, argv[i]);
+			buffer += setup_argument(buffer, invocation, i + 2, *argv[i]);
 		}
 		[invocation invoke];
 	}
