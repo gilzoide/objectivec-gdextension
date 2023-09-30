@@ -68,6 +68,12 @@ Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, 
 	}
 }
 
+bool ObjCObject::is_kind_of_class(const String& class_name) const {
+	Class cls = class_from_string(class_name);
+	ERR_FAIL_COND_V_MSG(!cls, false, "Objective-C class not found: " + class_name);
+	return [obj isKindOfClass:cls];
+}
+
 Array ObjCObject::to_array() const {
 	if (!obj) {
 		return Array();
@@ -106,6 +112,7 @@ void ObjCObject::_bind_methods() {
 		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
 		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjCObject::perform_selector, mi);
 	}
+	ClassDB::bind_method(D_METHOD("is_kind_of_class"), &ObjCObject::is_kind_of_class);
 	ClassDB::bind_method(D_METHOD("to_array"), &ObjCObject::to_array);
 	ClassDB::bind_method(D_METHOD("to_dictionary"), &ObjCObject::to_dictionary);
 }
