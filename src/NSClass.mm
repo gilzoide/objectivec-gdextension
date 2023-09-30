@@ -26,7 +26,7 @@
 
 #include <godot_cpp/core/error_macros.hpp>
 
-namespace objcgdextension {
+namespace objcgdextension::classes {
 
 NSClass::NSClass() : ObjCObject() {}
 

@@ -99,8 +99,8 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		}
 			
 		case '#': {
-			ObjCObject *obj;
-			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjCObject>(value.operator Object*()))) {
+			classes::ObjCObject *obj;
+			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<classes::ObjCObject>(value))) {
 				return set_argument(buffer, invocation, arg_number, obj->get_obj());
 			}
 			else {
@@ -195,7 +195,7 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 			case '#': {
 				Class result;
 				[invocation getReturnValue:&result];
-				return memnew(NSClass(result));
+				return memnew(classes::NSClass(result));
 			}
 
 			case 'v':

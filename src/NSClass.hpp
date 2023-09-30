@@ -26,7 +26,7 @@
 
 using namespace godot;
 
-namespace objcgdextension {
+namespace objcgdextension::classes {
 
 class NSClass : public ObjCObject {
 	GDCLASS(NSClass, ObjCObject);

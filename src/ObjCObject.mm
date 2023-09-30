@@ -30,7 +30,7 @@
 #include <gdextension_interface.h>
 #include <godot_cpp/core/error_macros.hpp>
 
-namespace objcgdextension {
+namespace objcgdextension::classes {
 
 ObjCObject::ObjCObject() : obj() {}
 

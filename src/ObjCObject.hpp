@@ -27,7 +27,7 @@
 
 using namespace godot;
 
-namespace objcgdextension {
+namespace objcgdextension::classes {
 
 class ObjCObject : public RefCounted {
 	GDCLASS(ObjCObject, RefCounted);
