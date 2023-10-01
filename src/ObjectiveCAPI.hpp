@@ -19,26 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjectiveC.hpp"
+#ifndef __OBJECTIVEC_HPP__
+#define __OBJECTIVEC_HPP__
 
-#include "ObjectiveCClass.hpp"
+#include <godot_cpp/classes/ref_counted.hpp>
 
-#include "objc_conversions.hpp"
+using namespace godot;
 
 namespace objcgdextension {
 
-ObjectiveCClass *ObjectiveC::get_class(const String& name) {
-	Class cls = class_from_string(name);
-	if (cls) {
-		return memnew(ObjectiveCClass(cls));
-	}
-	else {
-		return nullptr;
-	}
+class ObjectiveCClass;
+
+class ObjectiveCAPI : public RefCounted {
+	GDCLASS(ObjectiveCAPI, RefCounted);
+
+public:
+	ObjectiveCAPI();
+
+	ObjectiveCClass *find_class(const String& name) const;
+	
+	static ObjectiveCAPI *get_singleton();
+
+protected:
+	static void _bind_methods();
+
+	bool _get(const StringName& name, Variant& r_value);
+
+private:
+	static ObjectiveCAPI *instance;
+};
+
 }
 
-void ObjectiveC::_bind_methods() {
-	ClassDB::bind_static_method("ObjectiveC", D_METHOD("get_class", "name"), &ObjectiveC::get_class);
-}
-
-}
+#endif  // __OBJECTIVEC_HPP__

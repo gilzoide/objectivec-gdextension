@@ -19,27 +19,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJECTIVEC_HPP__
-#define __OBJECTIVEC_HPP__
+#include "ObjectiveCAPI.hpp"
 
-#include <godot_cpp/classes/ref_counted.hpp>
+#include "ObjectiveCClass.hpp"
+#include "objc_conversions.hpp"
 
-using namespace godot;
+#include <godot_cpp/core/error_macros.hpp>
 
 namespace objcgdextension {
 
-class ObjectiveCClass;
+ObjectiveCAPI *ObjectiveCAPI::instance;
 
-class ObjectiveC : public Object {
-	GDCLASS(ObjectiveC, Object);
-
-public:
-	static ObjectiveCClass *get_class(const String& name);
-
-protected:
-	static void _bind_methods();
-};
-
+ObjectiveCAPI::ObjectiveCAPI() {
+	ERR_FAIL_COND(instance != nullptr);
+	instance = this;
 }
 
-#endif  // __OBJECTIVEC_HPP__
+ObjectiveCClass *ObjectiveCAPI::find_class(const String& name) const {
+	Class cls = class_from_string(name);
+	if (cls) {
+		return memnew(ObjectiveCClass(cls));
+	}
+	else {
+		return nullptr;
+	}
+}
+
+ObjectiveCAPI *ObjectiveCAPI::get_singleton() {
+	return instance;
+}
+
+void ObjectiveCAPI::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("find_class", "name"), &ObjectiveCAPI::find_class);
+}
+
+bool ObjectiveCAPI::_get(const StringName& name, Variant& r_value) {
+	auto cls = find_class(name);
+	if (cls) {
+		r_value = cls;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+}

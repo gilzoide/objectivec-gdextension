@@ -19,12 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjectiveC.hpp"
+#include "ObjectiveCAPI.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/engine.hpp>
 
 using namespace godot;
 using namespace objcgdextension;
@@ -36,7 +37,16 @@ static void initialize(ModuleInitializationLevel level) {
 
 	ClassDB::register_abstract_class<ObjectiveCObject>();
 	ClassDB::register_abstract_class<ObjectiveCClass>();
-	ClassDB::register_abstract_class<ObjectiveC>();
+	ClassDB::register_abstract_class<ObjectiveCAPI>();
+	Engine::get_singleton()->register_singleton("ObjectiveC", memnew(ObjectiveCAPI));
+}
+
+static void terminate(ModuleInitializationLevel level) {
+	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) {
+		return;
+	}
+
+	Engine::get_singleton()->unregister_singleton("ObjectiveC");
 }
 
 extern "C" GDExtensionBool objcgdextension_entrypoint(
@@ -47,6 +57,7 @@ extern "C" GDExtensionBool objcgdextension_entrypoint(
 	GDExtensionBinding::InitObject init_obj(p_getprocaccess, p_library, r_initialization);
 
 	init_obj.register_initializer(&initialize);
+	init_obj.register_terminator(&terminate);
 	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
 	return init_obj.init();
