@@ -8,6 +8,7 @@ func _ready():
 	# 1. Check for availability
 	if not Engine.has_singleton("ObjectiveC"):
 		print("Sorry, ObjectiveC is available on macOS and iOS only")
+		return
 
 	# 2. Get the ObjectiveC singleton
 	var ObjectiveC = Engine.get_singleton("ObjectiveC")

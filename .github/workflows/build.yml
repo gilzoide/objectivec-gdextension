@@ -8,7 +8,7 @@ env:
   SCONS_CACHE: ${{ github.workspace }}/.scons-cache
 
 jobs:
-  build:
+  build_macos:
     name: ${{ matrix.platform }} (simulator=${{ matrix.simulator }}, ${{ matrix.arch }}, ${{ matrix.target }})
     runs-on: macos-latest
     strategy:
@@ -43,9 +43,49 @@ jobs:
           path: |
             addons/objc-gdextension/build/libobjcgdextension.*
 
+  build_linux:
+    name: ${{ matrix.platform }} (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, x86_32]
+        platform: [linux, windows, android]
+        include:
+          - platform: linux
+            arch: x86_32
+            packages: [g++-multilib]
+          - platform: windows
+            packages: [g++-mingw-w64]
+          - platform: android
+            arch: arm64
+          - platform: android
+            arch: arm32
+            scons-args: android_api_level=19
+          - platform: android
+            arch: x86_32
+            scons-args: android_api_level=19
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install scons ${{ join(matrix.packages, ' ') }}
+      - name: Build artifact
+        run: |
+          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release build_library=false ${{ join(matrix.scons-args, ' ') }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            addons/objc-gdextension/build/libobjcgdextension.*
+
   test_distribution:
     name: Test ${{ matrix.name }}
-    needs: [build]
+    needs: [build_macos]
     runs-on: ${{ matrix.runner-os }}
     strategy:
       fail-fast: false
@@ -84,7 +124,7 @@ jobs:
 
   build_distribution_zip:
     name: Build distribution zip
-    needs: [build]
+    needs: [build_macos, build_linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
