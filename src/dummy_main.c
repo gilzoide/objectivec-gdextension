@@ -22,8 +22,8 @@
 
 #include <gdextension_interface.h>
 
-static void initialize(void *, GDExtensionInitializationLevel) {}
-static void deinitialize(void *, GDExtensionInitializationLevel) {}
+static void initialize(void *data, GDExtensionInitializationLevel level) {}
+static void deinitialize(void *data, GDExtensionInitializationLevel level) {}
 
 GDExtensionBool objcgdextension_entrypoint(
 	const GDExtensionInterfaceGetProcAddress p_getprocaccess,
