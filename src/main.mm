@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ObjectiveC.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 
@@ -35,6 +36,7 @@ static void initialize(ModuleInitializationLevel level) {
 
 	ClassDB::register_abstract_class<ObjectiveCObject>();
 	ClassDB::register_abstract_class<ObjectiveCClass>();
+	ClassDB::register_abstract_class<ObjectiveC>();
 }
 
 extern "C" GDExtensionBool objcgdextension_entrypoint(

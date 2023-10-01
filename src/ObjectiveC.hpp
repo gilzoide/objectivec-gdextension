@@ -19,42 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjectiveCClass.hpp"
+#ifndef __OBJECTIVEC_HPP__
+#define __OBJECTIVEC_HPP__
 
-#include "objc_conversions.hpp"
-#include "objc_invocation.hpp"
+#include <godot_cpp/classes/ref_counted.hpp>
 
-#include <godot_cpp/core/error_macros.hpp>
+using namespace godot;
 
 namespace objcgdextension {
 
-ObjectiveCClass::ObjectiveCClass() : ObjectiveCObject() {}
+class ObjectiveCClass;
 
-ObjectiveCClass::ObjectiveCClass(id obj) : ObjectiveCObject(obj) {}
+class ObjectiveC : public Object {
+	GDCLASS(ObjectiveC, Object);
 
-Variant ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
-	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjectiveCClass is null");
-	if (argc < 1) {
-		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
-		error.argument = 1;
-		return Variant();
-	}
+public:
+	static ObjectiveCClass *get_class(const String& name);
 
-	String initSelector = *argv[0];
-	ERR_FAIL_COND_V_MSG(
-		!initSelector.begins_with("init"),
-		Variant(),
-		String("Expected initializer selector to begin with 'init': got '%s'") % initSelector
-	);
-
-	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
-}
-
-void ObjectiveCClass::_bind_methods() {
-	{
-		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
-		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjectiveCClass::alloc, mi);
-	}
-}
+protected:
+	static void _bind_methods();
+};
 
 }
+
+#endif  // __OBJECTIVEC_HPP__

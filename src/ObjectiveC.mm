@@ -19,42 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ObjectiveC.hpp"
+
 #include "ObjectiveCClass.hpp"
 
 #include "objc_conversions.hpp"
-#include "objc_invocation.hpp"
-
-#include <godot_cpp/core/error_macros.hpp>
 
 namespace objcgdextension {
 
-ObjectiveCClass::ObjectiveCClass() : ObjectiveCObject() {}
-
-ObjectiveCClass::ObjectiveCClass(id obj) : ObjectiveCObject(obj) {}
-
-Variant ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
-	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjectiveCClass is null");
-	if (argc < 1) {
-		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
-		error.argument = 1;
-		return Variant();
+ObjectiveCClass *ObjectiveC::get_class(const String& name) {
+	Class cls = class_from_string(name);
+	if (cls) {
+		return memnew(ObjectiveCClass(cls));
 	}
-
-	String initSelector = *argv[0];
-	ERR_FAIL_COND_V_MSG(
-		!initSelector.begins_with("init"),
-		Variant(),
-		String("Expected initializer selector to begin with 'init': got '%s'") % initSelector
-	);
-
-	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
+	else {
+		return nullptr;
+	}
 }
 
-void ObjectiveCClass::_bind_methods() {
-	{
-		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
-		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjectiveCClass::alloc, mi);
-	}
+void ObjectiveC::_bind_methods() {
+	ClassDB::bind_static_method("ObjectiveC", D_METHOD("get_class", "name"), &ObjectiveC::get_class);
 }
 
 }
