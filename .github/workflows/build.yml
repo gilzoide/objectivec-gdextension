@@ -75,7 +75,7 @@ jobs:
           sudo apt-get install scons ${{ join(matrix.packages, ' ') }}
       - name: Build artifact
         run: |
-          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release ${{ join(matrix.scons-args, ' ') }}
+          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release build_library=false ${{ join(matrix.scons-args, ' ') }}
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
