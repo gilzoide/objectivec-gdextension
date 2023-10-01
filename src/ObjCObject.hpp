@@ -27,15 +27,15 @@
 
 using namespace godot;
 
-namespace objcgdextension::classes {
+namespace objcgdextension {
 
-class NSObject : public RefCounted {
-	GDCLASS(NSObject, RefCounted);
+class ObjCObject : public RefCounted {
+	GDCLASS(ObjCObject, RefCounted);
 
 public:
-	NSObject();
-	NSObject(id obj);
-	~NSObject();
+	ObjCObject();
+	ObjCObject(id obj);
+	~ObjCObject();
 
 	id get_obj();
 	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);

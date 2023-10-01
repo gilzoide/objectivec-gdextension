@@ -19,8 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "NSClass.hpp"
-#include "NSObject.hpp"
+#include "ObjCClass.hpp"
+#include "ObjCObject.hpp"
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -33,8 +33,8 @@ static void initialize(ModuleInitializationLevel level) {
 		return;
 	}
 
-	ClassDB::register_abstract_class<classes::NSObject>();
-	ClassDB::register_abstract_class<classes::NSClass>();
+	ClassDB::register_abstract_class<ObjCObject>();
+	ClassDB::register_abstract_class<ObjCClass>();
 }
 
 extern "C" GDExtensionBool objcgdextension_entrypoint(

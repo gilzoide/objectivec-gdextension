@@ -21,8 +21,8 @@
  */
 #include "objc_conversions.hpp"
 
-#include "NSClass.hpp"
-#include "NSObject.hpp"
+#include "ObjCObject.hpp"
+#include "ObjCClass.hpp"
 
 #include <Foundation/Foundation.h>
 #include <objc/runtime.h>
@@ -59,7 +59,7 @@ Variant to_variant(NSObject *obj) {
 		return Variant();
 	}
 	else if (object_isClass(obj)) {
-		return memnew(classes::NSClass(obj));
+		return memnew(ObjCClass(obj));
 	}
 	else if ([obj isKindOfClass:NSString.class]) {
 		NSString *string = (NSString *) obj;
@@ -74,7 +74,7 @@ Variant to_variant(NSObject *obj) {
 		return to_variant(data);
 	}
 	else {
-		return memnew(classes::NSObject(obj));
+		return memnew(ObjCObject(obj));
 	}
 }
 
@@ -198,7 +198,7 @@ NSObject *to_nsobject(const Variant& value) {
 
 		case godot::Variant::OBJECT: {
 			Object *obj = value;
-			if (auto objc_obj = Object::cast_to<classes::NSObject>(obj)) {
+			if (ObjCObject *objc_obj = Object::cast_to<ObjCObject>(obj)) {
 				return objc_obj->get_obj();
 			}
 			else {

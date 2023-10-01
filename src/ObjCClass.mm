@@ -19,21 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "NSClass.hpp"
+#include "ObjCClass.hpp"
 
 #include "objc_conversions.hpp"
 #include "objc_invocation.hpp"
 
 #include <godot_cpp/core/error_macros.hpp>
 
-namespace objcgdextension::classes {
+namespace objcgdextension {
 
-NSClass::NSClass() : NSObject() {}
+ObjCClass::ObjCClass() : ObjCObject() {}
 
-NSClass::NSClass(id obj) : NSObject(obj) {}
+ObjCClass::ObjCClass(id obj) : ObjCObject(obj) {}
 
-Variant NSClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
-	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "NSClass is null");
+Variant ObjCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCClass is null");
 	if (argc < 1) {
 		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
 		error.argument = 1;
@@ -50,22 +50,22 @@ Variant NSClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCal
 	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
 }
 
-NSClass *NSClass::from_string(const String& name) {
+ObjCClass *ObjCClass::from_string(const String& name) {
 	Class cls = class_from_string(name);
 	if (cls) {
-		return memnew(NSClass(cls));
+		return memnew(ObjCClass(cls));
 	}
 	else {
 		return nullptr;
 	}
 }
 
-void NSClass::_bind_methods() {
+void ObjCClass::_bind_methods() {
 	{
 		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
-		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &NSClass::alloc, mi);
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjCClass::alloc, mi);
 	}
-	ClassDB::bind_static_method("NSClass", D_METHOD("from_string", "name"), &NSClass::from_string);
+	ClassDB::bind_static_method("ObjCClass", D_METHOD("from_string", "name"), &ObjCClass::from_string);
 }
 
 }

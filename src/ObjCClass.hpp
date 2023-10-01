@@ -22,21 +22,21 @@
 #ifndef __OBJC_CLASS_HPP__
 #define __OBJC_CLASS_HPP__
 
-#include "NSObject.hpp"
+#include "ObjCObject.hpp"
 
 using namespace godot;
 
-namespace objcgdextension::classes {
+namespace objcgdextension {
 
-class NSClass : public NSObject {
-	GDCLASS(NSClass, NSObject);
+class ObjCClass : public ObjCObject {
+	GDCLASS(ObjCClass, ObjCObject);
 
 public:
-	NSClass();
-	NSClass(id obj);
+	ObjCClass();
+	ObjCClass(id obj);
 
 	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-	static NSClass *from_string(const String& name);
+	static ObjCClass *from_string(const String& name);
 
 protected:
 	static void _bind_methods();
