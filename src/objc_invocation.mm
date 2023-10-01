@@ -82,14 +82,14 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		case 'L':
 		case 'q':
 		case 'Q':
-			return set_argument(buffer, invocation, arg_number, value.operator int64_t());
+			return set_argument(buffer, invocation, arg_number, (int64_t) value);
 		
 		case 'f':
 		case 'd':
-			return set_argument(buffer, invocation, arg_number, value.operator double());
+			return set_argument(buffer, invocation, arg_number, (double) value);
 		
 		case ':': {
-			SEL sel = to_selector(value.operator String());
+			SEL sel = to_selector(value);
 			return set_argument(buffer, invocation, arg_number, sel);
 		}
 
@@ -100,11 +100,11 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 			
 		case '#': {
 			ObjectiveCObject *obj;
-			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjectiveCObject>(value.operator Object*()))) {
+			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjectiveCObject>(value))) {
 				return set_argument(buffer, invocation, arg_number, obj->get_obj());
 			}
 			else {
-				Class cls = class_from_string(value.operator String());
+				Class cls = class_from_string(value);
 				return set_argument(buffer, invocation, arg_number, cls);
 			}
 		}
