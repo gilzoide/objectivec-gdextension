@@ -19,35 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjectiveC.hpp"
-#include "ObjectiveCClass.hpp"
-#include "ObjectiveCObject.hpp"
+#ifndef __OBJECTIVEC_OBJECT_HPP__
+#define __OBJECTIVEC_OBJECT_HPP__
 
-#include <godot_cpp/godot.hpp>
-#include <godot_cpp/core/class_db.hpp>
+#include <gdextension_interface.h>
+#include <godot_cpp/classes/ref_counted.hpp>
 
 using namespace godot;
-using namespace objcgdextension;
 
-static void initialize(ModuleInitializationLevel level) {
-	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		return;
-	}
+namespace objcgdextension {
 
-	ClassDB::register_abstract_class<ObjectiveCObject>();
-	ClassDB::register_abstract_class<ObjectiveCClass>();
-	ClassDB::register_abstract_class<ObjectiveC>();
+class ObjectiveCObject : public RefCounted {
+	GDCLASS(ObjectiveCObject, RefCounted);
+
+public:
+	ObjectiveCObject();
+	ObjectiveCObject(id obj);
+	~ObjectiveCObject();
+
+	id get_obj();
+	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
+	bool is_kind_of_class(const String& class_name) const;
+	bool responds_to_selector(const String& selector) const;
+	bool conforms_to_protocol(const String& protocol_name) const;
+
+	Array to_array() const;
+	Dictionary to_dictionary() const;
+
+protected:
+	static void _bind_methods();
+
+	bool _set(const StringName& name, const Variant& value);
+	bool _get(const StringName& name, Variant& r_value);
+
+	String _to_string();
+
+	id obj;
+};
+
 }
 
-extern "C" GDExtensionBool objcgdextension_entrypoint(
-	const GDExtensionInterfaceGetProcAddress p_getprocaccess,
-	GDExtensionClassLibraryPtr p_library,
-	GDExtensionInitialization *r_initialization
-) {
-	GDExtensionBinding::InitObject init_obj(p_getprocaccess, p_library, r_initialization);
-
-	init_obj.register_initializer(&initialize);
-	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
-
-	return init_obj.init();
-}
+#endif  // __OBJECTIVEC_OBJECT_HPP__

@@ -44,7 +44,7 @@ func _ready():
         return
 
     # 1. Get the Objective-C class by name
-    var NSAlert = NSClass.from_string("NSAlert")
+    var NSAlert = ObjectiveC.get_class("NSAlert")
 
     # 2. Alloc and init objects
     var alert = NSAlert.alloc("init")

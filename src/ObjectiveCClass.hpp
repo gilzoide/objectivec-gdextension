@@ -19,35 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjectiveC.hpp"
-#include "ObjectiveCClass.hpp"
+#ifndef __OBJECTIVEC_CLASS_HPP__
+#define __OBJECTIVEC_CLASS_HPP__
+
 #include "ObjectiveCObject.hpp"
 
-#include <godot_cpp/godot.hpp>
-#include <godot_cpp/core/class_db.hpp>
-
 using namespace godot;
-using namespace objcgdextension;
 
-static void initialize(ModuleInitializationLevel level) {
-	if (level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		return;
-	}
+namespace objcgdextension {
 
-	ClassDB::register_abstract_class<ObjectiveCObject>();
-	ClassDB::register_abstract_class<ObjectiveCClass>();
-	ClassDB::register_abstract_class<ObjectiveC>();
+class ObjectiveCClass : public ObjectiveCObject {
+	GDCLASS(ObjectiveCClass, ObjectiveCObject);
+
+public:
+	ObjectiveCClass();
+	ObjectiveCClass(id obj);
+
+	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
+
+protected:
+	static void _bind_methods();
+};
+
 }
 
-extern "C" GDExtensionBool objcgdextension_entrypoint(
-	const GDExtensionInterfaceGetProcAddress p_getprocaccess,
-	GDExtensionClassLibraryPtr p_library,
-	GDExtensionInitialization *r_initialization
-) {
-	GDExtensionBinding::InitObject init_obj(p_getprocaccess, p_library, r_initialization);
-
-	init_obj.register_initializer(&initialize);
-	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
-
-	return init_obj.init();
-}
+#endif  // __OBJECTIVEC_CLASS_HPP__

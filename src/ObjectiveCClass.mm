@@ -19,44 +19,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_OBJECT_HPP__
-#define __OBJC_OBJECT_HPP__
+#include "ObjectiveCClass.hpp"
 
-#include <gdextension_interface.h>
-#include <godot_cpp/classes/ref_counted.hpp>
+#include "objc_conversions.hpp"
+#include "objc_invocation.hpp"
 
-using namespace godot;
+#include <godot_cpp/core/error_macros.hpp>
 
-namespace objcgdextension::classes {
+namespace objcgdextension {
 
-class NSObject : public RefCounted {
-	GDCLASS(NSObject, RefCounted);
+ObjectiveCClass::ObjectiveCClass() : ObjectiveCObject() {}
 
-public:
-	NSObject();
-	NSObject(id obj);
-	~NSObject();
+ObjectiveCClass::ObjectiveCClass(id obj) : ObjectiveCObject(obj) {}
 
-	id get_obj();
-	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-	bool is_kind_of_class(const String& class_name) const;
-	bool responds_to_selector(const String& selector) const;
-	bool conforms_to_protocol(const String& protocol_name) const;
+Variant ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjectiveCClass is null");
+	if (argc < 1) {
+		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
+		error.argument = 1;
+		return Variant();
+	}
 
-	Array to_array() const;
-	Dictionary to_dictionary() const;
+	String initSelector = *argv[0];
+	ERR_FAIL_COND_V_MSG(
+		!initSelector.begins_with("init"),
+		Variant(),
+		String("Expected initializer selector to begin with 'init': got '%s'") % initSelector
+	);
 
-protected:
-	static void _bind_methods();
-
-	bool _set(const StringName& name, const Variant& value);
-	bool _get(const StringName& name, Variant& r_value);
-
-	String _to_string();
-
-	id obj;
-};
-
+	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
 }
 
-#endif  // __OBJC_OBJECT_HPP__
+void ObjectiveCClass::_bind_methods() {
+	{
+		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjectiveCClass::alloc, mi);
+	}
+}
+
+}

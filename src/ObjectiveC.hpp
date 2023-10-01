@@ -19,24 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_CLASS_HPP__
-#define __OBJC_CLASS_HPP__
+#ifndef __OBJECTIVEC_HPP__
+#define __OBJECTIVEC_HPP__
 
-#include "NSObject.hpp"
+#include <godot_cpp/classes/ref_counted.hpp>
 
 using namespace godot;
 
-namespace objcgdextension::classes {
+namespace objcgdextension {
 
-class NSClass : public NSObject {
-	GDCLASS(NSClass, NSObject);
+class ObjectiveCClass;
+
+class ObjectiveC : public Object {
+	GDCLASS(ObjectiveC, Object);
 
 public:
-	NSClass();
-	NSClass(id obj);
-
-	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-	static NSClass *from_string(const String& name);
+	static ObjectiveCClass *get_class(const String& name);
 
 protected:
 	static void _bind_methods();
@@ -44,4 +42,4 @@ protected:
 
 }
 
-#endif  // __OBJC_CLASS_HPP__
+#endif  // __OBJECTIVEC_HPP__
