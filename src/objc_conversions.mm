@@ -21,8 +21,8 @@
  */
 #include "objc_conversions.hpp"
 
-#include "ObjCObject.hpp"
-#include "ObjCClass.hpp"
+#include "ObjectiveCClass.hpp"
+#include "ObjectiveCObject.hpp"
 
 #include <Foundation/Foundation.h>
 #include <objc/runtime.h>

@@ -19,8 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjCClass.hpp"
-#include "ObjCObject.hpp"
+#include "ObjectiveCClass.hpp"
+#include "ObjectiveCObject.hpp"
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>

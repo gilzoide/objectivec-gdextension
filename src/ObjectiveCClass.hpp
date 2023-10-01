@@ -19,44 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_OBJECT_HPP__
-#define __OBJC_OBJECT_HPP__
+#ifndef __OBJECTIVEC_CLASS_HPP__
+#define __OBJECTIVEC_CLASS_HPP__
 
-#include <gdextension_interface.h>
-#include <godot_cpp/classes/ref_counted.hpp>
+#include "ObjectiveCObject.hpp"
 
 using namespace godot;
 
 namespace objcgdextension {
 
-class ObjectiveCObject : public RefCounted {
-	GDCLASS(ObjectiveCObject, RefCounted);
+class ObjectiveCClass : public ObjectiveCObject {
+	GDCLASS(ObjectiveCClass, ObjectiveCObject);
 
 public:
-	ObjectiveCObject();
-	ObjectiveCObject(id obj);
-	~ObjectiveCObject();
+	ObjectiveCClass();
+	ObjectiveCClass(id obj);
 
-	id get_obj();
-	Variant perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-	bool is_kind_of_class(const String& class_name) const;
-	bool responds_to_selector(const String& selector) const;
-	bool conforms_to_protocol(const String& protocol_name) const;
-
-	Array to_array() const;
-	Dictionary to_dictionary() const;
+	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
+	static ObjectiveCClass *from_string(const String& name);
 
 protected:
 	static void _bind_methods();
-
-	bool _set(const StringName& name, const Variant& value);
-	bool _get(const StringName& name, Variant& r_value);
-
-	String _to_string();
-
-	id obj;
 };
 
 }
 
-#endif  // __OBJC_OBJECT_HPP__
+#endif  // __OBJECTIVEC_CLASS_HPP__
