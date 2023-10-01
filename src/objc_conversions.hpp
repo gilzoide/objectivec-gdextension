@@ -43,7 +43,7 @@ Variant to_variant(NSDictionary *dictionary);
 Variant to_variant(NSData *data);
 
 NSObject *to_nsobject(const Variant& value);
-NSString *to_nsstring(const String& string);
+NSMutableString *to_nsmutablestring(const String& string);
 NSNumber *to_nsnumber(bool value);
 NSNumber *to_nsnumber(int64_t value);
 NSNumber *to_nsnumber(double value);

@@ -14,15 +14,15 @@ Use at your own risk.
   Just use the same property names as in Objective-C and you're good to go.
 - Automatic reference counting of Objective-C objects, since they are wrapped in `RefCounted` subclasses
 - Automatic conversion from Godot data to Objective-C:
-  + `String`, `StringName`, `NodePath` -> `NSString`
+  + `String`, `StringName`, `NodePath` -> `NSMutableString`
   + `Array` -> `NSMutableArray`
   + `Dictionary` -> `NSMutableDictionary`
   + `PackedByteArray` -> `NSMutableData`
 - Automatic conversion from Objective-C data to Godot:
   + `NSString` -> `String`
   + `NSNumber` -> `bool`, `int` or `float`
-- `to_array` method for converting Objective-C objects that conform to `NSFastEnumeration` protocol, like `NSArray` and `NSSet`, to Godot `Array`
-- `to_dictionary` method for converting Objective-C objects that conform to `NSFastEnumeration` protocol and support `objectForKey:` message, like `NSDictionary`, to Godot `Dictionary`
+- `to_array` method for converting Objective-C objects that support enumeration, like `NSArray` and `NSSet`, to Godot `Array`
+- `to_dictionary` method for converting Objective-C objects that support enumeration and the `objectForKey:` message, like `NSDictionary`, to Godot `Dictionary`
 - Other useful methods, like `is_kind_of_class`, `responds_to_selector` and `conforms_to_protocol`
 
 

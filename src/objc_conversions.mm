@@ -185,7 +185,7 @@ NSObject *to_nsobject(const Variant& value) {
 		case godot::Variant::STRING:
 		case godot::Variant::STRING_NAME:
 		case godot::Variant::NODE_PATH:
-			return to_nsstring(value);
+			return to_nsmutablestring(value);
 
 		case godot::Variant::ARRAY:
 			return to_nsmutablearray(value);
@@ -238,9 +238,9 @@ NSObject *to_nsobject(const Variant& value) {
 	}
 }
 
-NSString *to_nsstring(const godot::String& string) {
+NSMutableString *to_nsmutablestring(const godot::String& string) {
 	CharString chars = string.utf8();
-	return [NSString stringWithUTF8String:chars.get_data()];
+	return [NSMutableString stringWithUTF8String:chars.get_data()];
 }
 
 NSNumber *to_nsnumber(bool value) {

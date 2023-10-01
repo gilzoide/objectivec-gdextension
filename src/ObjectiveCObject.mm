@@ -135,7 +135,7 @@ bool ObjectiveCObject::_set(const StringName& name, const Variant& value) {
 	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjectiveCObject is null");
 
 	@try {
-		NSString *key = to_nsstring(name);
+		NSString *key = to_nsmutablestring(name);
 		[obj setValue:to_nsobject(value) forKey:key];
 		return true;
 	}
@@ -148,7 +148,7 @@ bool ObjectiveCObject::_get(const StringName& name, Variant& r_value) {
 	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjectiveCObject is null");
 
 	@try {
-		NSString *key = to_nsstring(name);
+		NSString *key = to_nsmutablestring(name);
 		r_value = to_variant((NSObject *) [obj valueForKey:key]);
 		return true;
 	}
