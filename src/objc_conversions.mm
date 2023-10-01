@@ -59,7 +59,7 @@ Variant to_variant(NSObject *obj) {
 		return Variant();
 	}
 	else if (object_isClass(obj)) {
-		return memnew(ObjCClass(obj));
+		return memnew(ObjectiveCClass(obj));
 	}
 	else if ([obj isKindOfClass:NSString.class]) {
 		NSString *string = (NSString *) obj;
@@ -74,7 +74,7 @@ Variant to_variant(NSObject *obj) {
 		return to_variant(data);
 	}
 	else {
-		return memnew(ObjCObject(obj));
+		return memnew(ObjectiveCObject(obj));
 	}
 }
 
@@ -198,7 +198,7 @@ NSObject *to_nsobject(const Variant& value) {
 
 		case godot::Variant::OBJECT: {
 			Object *obj = value;
-			if (ObjCObject *objc_obj = Object::cast_to<ObjCObject>(obj)) {
+			if (ObjectiveCObject *objc_obj = Object::cast_to<ObjectiveCObject>(obj)) {
 				return objc_obj->get_obj();
 			}
 			else {

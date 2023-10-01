@@ -33,8 +33,8 @@ static void initialize(ModuleInitializationLevel level) {
 		return;
 	}
 
-	ClassDB::register_abstract_class<ObjCObject>();
-	ClassDB::register_abstract_class<ObjCClass>();
+	ClassDB::register_abstract_class<ObjectiveCObject>();
+	ClassDB::register_abstract_class<ObjectiveCClass>();
 }
 
 extern "C" GDExtensionBool objcgdextension_entrypoint(

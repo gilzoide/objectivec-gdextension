@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ObjCObject.hpp"
+#include "ObjectiveCObject.hpp"
 
 #include "objc_conversions.hpp"
 #include "objc_invocation.hpp"
@@ -32,9 +32,9 @@
 
 namespace objcgdextension {
 
-ObjCObject::ObjCObject() : obj() {}
+ObjectiveCObject::ObjectiveCObject() : obj() {}
 
-ObjCObject::ObjCObject(id obj) {
+ObjectiveCObject::ObjectiveCObject(id obj) {
 	if (obj) {
 		this->obj = [obj retain];
 	}
@@ -43,18 +43,18 @@ ObjCObject::ObjCObject(id obj) {
 	}
 }
 
-ObjCObject::~ObjCObject() {
+ObjectiveCObject::~ObjectiveCObject() {
 	if (obj) {
 		[obj release];
 	}
 }
 
-id ObjCObject::get_obj() {
+id ObjectiveCObject::get_obj() {
 	return obj;
 }
 
-Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
-	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjCObject is null");
+Variant ObjectiveCObject::perform_selector(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjectiveCObject is null");
 	if (argc < 1) {
 		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
 		error.argument = 1;
@@ -68,25 +68,25 @@ Variant ObjCObject::perform_selector(const Variant **argv, GDExtensionInt argc, 
 	}
 }
 
-bool ObjCObject::is_kind_of_class(const String& class_name) const {
+bool ObjectiveCObject::is_kind_of_class(const String& class_name) const {
 	Class cls = class_from_string(class_name);
 	ERR_FAIL_COND_V_MSG(!cls, false, "Objective-C class not found: " + class_name);
 	return [obj isKindOfClass:cls];
 }
 
-bool ObjCObject::responds_to_selector(const String& selector) const {
+bool ObjectiveCObject::responds_to_selector(const String& selector) const {
 	SEL sel = to_selector(selector);
 	ERR_FAIL_COND_V_MSG(!sel, false, "Invalid selector: " + selector);
 	return [obj respondsToSelector:sel];
 }
 
-bool ObjCObject::conforms_to_protocol(const String& protocol_name) const {
+bool ObjectiveCObject::conforms_to_protocol(const String& protocol_name) const {
 	Protocol *protocol = protocol_from_string(protocol_name);
 	ERR_FAIL_COND_V_MSG(!protocol, false, "Invalid protocol: " + protocol_name);
 	return [obj conformsToProtocol:protocol];
 }
 
-Array ObjCObject::to_array() const {
+Array ObjectiveCObject::to_array() const {
 	if (!obj) {
 		return Array();
 	}
@@ -102,7 +102,7 @@ Array ObjCObject::to_array() const {
 	}
 }
 
-Dictionary ObjCObject::to_dictionary() const {
+Dictionary ObjectiveCObject::to_dictionary() const {
 	if (!obj) {
 		return Dictionary();
 	}
@@ -119,20 +119,20 @@ Dictionary ObjCObject::to_dictionary() const {
 	}
 }
 
-void ObjCObject::_bind_methods() {
+void ObjectiveCObject::_bind_methods() {
 	{
 		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
-		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjCObject::perform_selector, mi);
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjectiveCObject::perform_selector, mi);
 	}
-	ClassDB::bind_method(D_METHOD("is_kind_of_class", "class_name"), &ObjCObject::is_kind_of_class);
-	ClassDB::bind_method(D_METHOD("responds_to_selector", "selector"), &ObjCObject::responds_to_selector);
-	ClassDB::bind_method(D_METHOD("conforms_to_protocol", "protocol_name"), &ObjCObject::conforms_to_protocol);
-	ClassDB::bind_method(D_METHOD("to_array"), &ObjCObject::to_array);
-	ClassDB::bind_method(D_METHOD("to_dictionary"), &ObjCObject::to_dictionary);
+	ClassDB::bind_method(D_METHOD("is_kind_of_class", "class_name"), &ObjectiveCObject::is_kind_of_class);
+	ClassDB::bind_method(D_METHOD("responds_to_selector", "selector"), &ObjectiveCObject::responds_to_selector);
+	ClassDB::bind_method(D_METHOD("conforms_to_protocol", "protocol_name"), &ObjectiveCObject::conforms_to_protocol);
+	ClassDB::bind_method(D_METHOD("to_array"), &ObjectiveCObject::to_array);
+	ClassDB::bind_method(D_METHOD("to_dictionary"), &ObjectiveCObject::to_dictionary);
 }
 
-bool ObjCObject::_set(const StringName& name, const Variant& value) {
-	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjCObject is null");
+bool ObjectiveCObject::_set(const StringName& name, const Variant& value) {
+	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjectiveCObject is null");
 
 	@try {
 		NSString *key = to_nsstring(name);
@@ -144,8 +144,8 @@ bool ObjCObject::_set(const StringName& name, const Variant& value) {
 	}
 }
 
-bool ObjCObject::_get(const StringName& name, Variant& r_value) {
-	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjCObject is null");
+bool ObjectiveCObject::_get(const StringName& name, Variant& r_value) {
+	ERR_FAIL_COND_V_EDMSG(!obj, false, "ObjectiveCObject is null");
 
 	@try {
 		NSString *key = to_nsstring(name);
@@ -157,7 +157,7 @@ bool ObjCObject::_get(const StringName& name, Variant& r_value) {
 	}
 }
 
-String ObjCObject::_to_string() {
+String ObjectiveCObject::_to_string() {
 	if (obj) {
 		return [obj description].UTF8String;
 	}

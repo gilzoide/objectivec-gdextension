@@ -28,15 +28,15 @@ using namespace godot;
 
 namespace objcgdextension {
 
-class ObjCClass : public ObjCObject {
-	GDCLASS(ObjCClass, ObjCObject);
+class ObjectiveCClass : public ObjectiveCObject {
+	GDCLASS(ObjectiveCClass, ObjectiveCObject);
 
 public:
-	ObjCClass();
-	ObjCClass(id obj);
+	ObjectiveCClass();
+	ObjectiveCClass(id obj);
 
 	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
-	static ObjCClass *from_string(const String& name);
+	static ObjectiveCClass *from_string(const String& name);
 
 protected:
 	static void _bind_methods();
