@@ -23,31 +23,36 @@ else:  # build library
     compiledb = env.CompilationDatabase("compile_commands.json")
     env.Alias("compiledb", compiledb)
 
-    # Compile flags
-    env.Append(LINKFLAGS="-framework Foundation")
+    if env["platform"] in ["macos", "ios"]:
+        # Compile flags
+        env.Append(LINKFLAGS="-framework Foundation")
 
-    # Compile with debugging symbols
-    if ARGUMENTS.get("debugging_symbols") == 'true':
-        if "-O2" in env["CCFLAGS"]:
-            env["CCFLAGS"].remove("-O2")
-        env.Append(CCFLAGS=["-g", "-O0"])
+        # Compile with debugging symbols
+        if ARGUMENTS.get("debugging_symbols") == 'true':
+            if "-O2" in env["CCFLAGS"]:
+                env["CCFLAGS"].remove("-O2")
+            env.Append(CCFLAGS=["-g", "-O0"])
 
-    # Setup variant build dir for each setup
-    def remove_prefix(s, prefix):
-        return s[len(prefix):] if s.startswith(prefix) else s
+        # Setup variant build dir for each setup
+        def remove_prefix(s, prefix):
+            return s[len(prefix):] if s.startswith(prefix) else s
 
-    build_dir = "build/{}".format(remove_prefix(env["suffix"], "."))
-    VariantDir(build_dir, 'src', duplicate=False)
+        build_dir = "build/{}".format(remove_prefix(env["suffix"], "."))
+        VariantDir(build_dir, 'src', duplicate=False)
 
-    # Build Objective-C GDExtension
-    source_directories = ["."]
-    sources = [
-        Glob("{}/{}/*.cpp".format(build_dir, directory)) + Glob("{}/{}/*.mm".format(build_dir, directory))
-        for directory in source_directories
-    ]
-    library = env.SharedLibrary(
-        "addons/objc-gdextension/build/libobjcgdextension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
-        source=sources,
-    )
-
+        # Build Objective-C GDExtension
+        source_directories = ["."]
+        sources = [
+            Glob("{}/{}/*.cpp".format(build_dir, directory)) + Glob("{}/{}/*.mm".format(build_dir, directory))
+            for directory in source_directories
+        ]
+        library = env.SharedLibrary(
+            "addons/objc-gdextension/build/libobjcgdextension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+            source=sources,
+        )
+    else:
+        library = env.SharedLibrary(
+            "addons/objc-gdextension/build/libobjcgdextension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+            source="src/dummy_main.c",
+        )
     Default(library)
