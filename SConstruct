@@ -51,7 +51,8 @@ else:  # build library
             source=sources,
         )
     else:
-        library = env.SharedLibrary(
+        dummy_env = Environment(CPPPATH="lib/godot-cpp/gdextension")
+        library = dummy_env.SharedLibrary(
             "addons/objc-gdextension/build/libobjcgdextension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
             source="src/dummy_main.c",
         )
