@@ -81,7 +81,7 @@ jobs:
         with:
           name: ${{ matrix.platform }}-${{ matrix.arch }}
           path: |
-            addons/lua-gdextension/build/libobjcgdextension.*
+            addons/objc-gdextension/build/libobjcgdextension.*
 
   test_distribution:
     name: Test ${{ matrix.name }}
