@@ -198,7 +198,10 @@ NSObject *to_nsobject(const Variant& value) {
 
 		case godot::Variant::OBJECT: {
 			Object *obj = value;
-			if (auto objc_obj = Object::cast_to<ObjectiveCObject>(obj)) {
+			if (!obj) {
+				return nil;
+			}
+			else if (auto objc_obj = Object::cast_to<ObjectiveCObject>(obj)) {
 				return objc_obj->get_obj();
 			}
 			else {
