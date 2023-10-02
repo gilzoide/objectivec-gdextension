@@ -19,21 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_INVOCATION_HPP__
-#define __OBJC_INVOCATION_HPP__
+#include "NSInvocation+ReturnOrArgument.hpp"
 
-#include <Foundation/Foundation.h>
+@implementation NSInvocation(ReturnOrArgument)
 
-#include <gdextension_interface.h>
-#include <godot_cpp/variant/variant.hpp>
-
-using namespace godot;
-
-namespace objcgdextension {
-
-Variant return_or_argument_to_variant(NSInvocation *invocation, NSInteger index);
-Variant invoke(id obj, const String& selector, const Variant **argv, GDExtensionInt argc);
-
+- (const char *)getReturnOrArgumentTypeWithIndex:(NSInteger)index {
+	if (index < 0) {
+		return self.methodSignature.methodReturnType;
+	}
+	else {
+		return [self.methodSignature getArgumentTypeAtIndex:index];
+	}
 }
 
-#endif  // __OBJC_INVOCATION_HPP__
+- (void)getReturnOrArgument:(void *)buffer withIndex:(NSInteger)index {
+	if (index < 0) {
+		[self getReturnValue:buffer];
+	}
+	else {
+		[self getArgument:buffer atIndex:index];
+	}
+}
+
+- (void)setReturnOrArgument:(void *)buffer withIndex:(NSInteger)index {
+	if (index < 0) {
+		[self setReturnValue:buffer];
+	}
+	else {
+		[self setArgument:buffer atIndex:index];
+	}
+}
+
+@end
