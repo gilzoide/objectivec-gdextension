@@ -19,38 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJECTIVEC_HPP__
-#define __OBJECTIVEC_HPP__
+#ifndef __OBJECTIVEC_BLOCK_HPP__
+#define __OBJECTIVEC_BLOCK_HPP__
 
-#include <godot_cpp/classes/ref_counted.hpp>
+#include <Foundation/Foundation.h>
+
+#include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
 
-namespace objcgdextension {
-
-class ObjectiveCClass;
-class ObjectiveCObject;
-
-class ObjectiveCAPI : public RefCounted {
-	GDCLASS(ObjectiveCAPI, RefCounted);
-
-public:
-	ObjectiveCAPI();
-
-	ObjectiveCClass *find_class(const String& name) const;
-	ObjectiveCObject *create_block(const String& objCTypes, const Callable& implementation) const;
-	
-	static ObjectiveCAPI *get_singleton();
-
-protected:
-	static void _bind_methods();
-
-	bool _get(const StringName& name, Variant& r_value);
-
-private:
-	static ObjectiveCAPI *instance;
-};
-
+// Reference: https://www.mikeash.com/pyblog/friday-qa-2011-10-28-generic-block-proxying.html
+// https://github.com/mikeash/MABlockForwarding
+@interface GDCallableBlock : NSObject
+{
+    int _flags;
+    int _reserved;
+    void *_invoke;
+    void *_descriptor;
+    
+    Callable _callable;
+	NSMethodSignature *_signature;
 }
 
-#endif  // __OBJECTIVEC_HPP__
++ (instancetype)blockWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
+- (instancetype)initWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
+
+- (void)invokeWithArgs:(NSData *)argsData;
+
+@end
+
+#endif  // __OBJECTIVEC_BLOCK_HPP__

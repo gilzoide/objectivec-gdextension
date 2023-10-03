@@ -21,7 +21,6 @@
  */
 #include "objc_invocation.hpp"
 
-#include "NSInvocation+ReturnOrArgument.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 #include "objc_conversions.hpp"
@@ -31,7 +30,6 @@
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/error_macros.hpp>
-#include <godot_cpp/variant/char_string.hpp>
 
 namespace objcgdextension {
 
@@ -100,9 +98,8 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		}
 			
 		case '#': {
-			ObjectiveCObject *obj;
-			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjectiveCObject>(value))) {
-				return set_argument(buffer, invocation, arg_number, obj->get_obj());
+			if (ObjectiveCClass *gdcls = Object::cast_to<ObjectiveCClass>(value)) {
+				return set_argument(buffer, invocation, arg_number, gdcls->get_obj());
 			}
 			else {
 				Class cls = class_from_string(value);
@@ -110,82 +107,12 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 			}
 		}
 
+		case '*':
+			// TODO: support 'const char *' arguments
 		default:
 			ERR_FAIL_V_MSG(0, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(type));
 	}
 	return 0;
-}
-
-template<typename TIn, typename TOut>
-Variant to_variant(NSInvocation *invocation, NSInteger index) {
-	TIn value;
-	[invocation getReturnOrArgument:&value withIndex:index];
-	return (TOut) value;
-}
-
-Variant return_or_argument_to_variant(NSInvocation *invocation, NSInteger index) {
-	const char *return_type = [invocation getReturnOrArgumentTypeWithIndex:index];
-	switch (return_type[0]) {
-		case 'B':
-			return to_variant<bool, bool>(invocation, index);
-
-		case 'c': {
-			char c;
-			[invocation getReturnOrArgument:&c withIndex:index];
-			if (c == 0 || c == 1) {
-				return (bool) c;
-			}
-			else {
-				return String::utf8(&c, 1);
-			}
-		}
-		case 'i':
-			return to_variant<int, int64_t>(invocation, index);
-		case 's':
-			return to_variant<short, int64_t>(invocation, index);
-		case 'l':
-			return to_variant<long, int64_t>(invocation, index);
-		case 'q':
-			return to_variant<long long, int64_t>(invocation, index);
-
-		case 'C':
-			return to_variant<unsigned char, int64_t>(invocation, index);
-		case 'I':
-			return to_variant<unsigned int, uint64_t>(invocation, index);
-		case 'S':
-			return to_variant<unsigned short, uint64_t>(invocation, index);
-		case 'L':
-			return to_variant<unsigned long, uint64_t>(invocation, index);
-		case 'Q':
-			return to_variant<unsigned long long, uint64_t>(invocation, index);
-		
-		case '*':
-			return to_variant<const char *, const char *>(invocation, index);
-		
-		case '@': {
-			NSObject *obj;
-			[invocation getReturnOrArgument:&obj withIndex:index];
-			return to_variant(obj);
-		}
-
-		case '#': {
-			Class cls;
-			[invocation getReturnOrArgument:&cls withIndex:index];
-			return memnew(ObjectiveCClass(cls));
-		}
-
-		case ':': {
-			SEL sel;
-			[invocation getReturnOrArgument:&sel withIndex:index];
-			return sel_getName(sel);
-		}
-
-		case 'v':
-			return Variant();
-
-		default:
-			ERR_FAIL_V_EDMSG(Variant(), String("Value with Objective-C encoded type '%s' is not supported yet") % String(return_type));
-	}
 }
 
 Variant invoke(id obj, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
@@ -217,7 +144,7 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 		}
 		[invocation invoke];
 
-		return return_or_argument_to_variant(invocation, -1);
+		return result_to_variant(invocation);
 	}
 }
 

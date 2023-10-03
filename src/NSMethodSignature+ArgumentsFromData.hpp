@@ -19,35 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "NSInvocation+ReturnOrArgument.hpp"
+#pragma once
 
-@implementation NSInvocation(ReturnOrArgument)
+#import <Foundation/Foundation.h>
 
-- (const char *)getReturnOrArgumentTypeWithIndex:(NSInteger)index {
-	if (index < 0) {
-		return self.methodSignature.methodReturnType;
-	}
-	else {
-		return [self.methodSignature getArgumentTypeAtIndex:index];
-	}
-}
+#include <godot_cpp/variant/variant.hpp>
 
-- (void)getReturnOrArgument:(void *)buffer withIndex:(NSInteger)index {
-	if (index < 0) {
-		[self getReturnValue:buffer];
-	}
-	else {
-		[self getArgument:buffer atIndex:index];
-	}
-}
+using namespace godot;
 
-- (void)setReturnOrArgument:(void *)buffer withIndex:(NSInteger)index {
-	if (index < 0) {
-		[self setReturnValue:buffer];
-	}
-	else {
-		[self setArgument:buffer atIndex:index];
-	}
-}
+@interface NSMethodSignature (ArgumentsFromData)
+
+- (NSUInteger)totalArgumentSize;
+- (Array)arrayFromArgumentData:(NSData *)data;
 
 @end

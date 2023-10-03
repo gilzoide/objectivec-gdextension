@@ -19,17 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __NSINVOCATION_RETURN_OR_ARGUMENT_HPP__
-#define __NSINVOCATION_RETURN_OR_ARGUMENT_HPP__
+#import "NSMethodSignature+ArgumentsFromData.hpp"
+
+#include "objc_conversions.hpp"
+#include "ObjectiveCClass.hpp"
 
 #include <Foundation/Foundation.h>
+#include <objc/NSObjCRuntime.h>
 
-@interface NSInvocation(ReturnOrArgument)
+using namespace objcgdextension;
 
-- (const char *)getReturnOrArgumentTypeWithIndex:(NSInteger)index;
-- (void)getReturnOrArgument:(void *)buffer withIndex:(NSInteger)index;
-- (void)setReturnOrArgument:(void *)buffer withIndex:(NSInteger)index;
+@implementation NSMethodSignature (ArgumentsFromData)
+
+- (NSUInteger)totalArgumentSize {
+	NSUInteger totalSize = 0;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		NSUInteger size, align;
+		NSGetSizeAndAlignment([self getArgumentTypeAtIndex:i], &size, &align);
+		// TODO: consider alignment
+		totalSize += size;
+	}
+	return totalSize;
+}
+
+- (Array)arrayFromArgumentData:(NSData *)data {
+	Array args;
+	const uint8_t *ptr = (const uint8_t *) data.bytes;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		const char *type = [self getArgumentTypeAtIndex:i];
+		args.append(to_variant(type, ptr));
+		NSUInteger size, align;
+		NSGetSizeAndAlignment(type, &size, &align);
+		ptr += size;
+	}
+	return args;
+}
 
 @end
-
-#endif  // __NSINVOCATION_RETURN_OR_ARGUMENT_HPP__

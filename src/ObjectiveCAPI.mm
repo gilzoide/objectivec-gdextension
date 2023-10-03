@@ -21,8 +21,11 @@
  */
 #include "ObjectiveCAPI.hpp"
 
+#include "GDCallableBlock.hpp"
 #include "ObjectiveCClass.hpp"
 #include "objc_conversions.hpp"
+
+#include <Foundation/Foundation.h>
 
 #include <godot_cpp/core/error_macros.hpp>
 
@@ -45,12 +48,23 @@ ObjectiveCClass *ObjectiveCAPI::find_class(const String& name) const {
 	}
 }
 
+ObjectiveCObject *ObjectiveCAPI::create_block(const String& objCTypes, const Callable& implementation) const {
+	@try {
+		NSMethodSignature *signature = [NSMethodSignature signatureWithObjCTypes:objCTypes.ascii().get_data()];
+		return memnew(ObjectiveCObject([GDCallableBlock blockWithCallable:implementation signature:signature]));
+	}
+	@catch (NSException *ex) {
+		ERR_FAIL_V_MSG(NULL, String("Invalid type encoding '%s': %s") % Array::make(objCTypes, String(ex.description.UTF8String)));
+	}
+}
+
 ObjectiveCAPI *ObjectiveCAPI::get_singleton() {
 	return instance;
 }
 
 void ObjectiveCAPI::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("find_class", "name"), &ObjectiveCAPI::find_class);
+	ClassDB::bind_method(D_METHOD("create_block",  "objc_types", "implementation"), &ObjectiveCAPI::create_block);
 }
 
 bool ObjectiveCAPI::_get(const StringName& name, Variant& r_value) {

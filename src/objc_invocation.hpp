@@ -31,7 +31,6 @@ using namespace godot;
 
 namespace objcgdextension {
 
-Variant return_or_argument_to_variant(NSInvocation *invocation, NSInteger index);
 Variant invoke(id obj, const String& selector, const Variant **argv, GDExtensionInt argc);
 
 }
