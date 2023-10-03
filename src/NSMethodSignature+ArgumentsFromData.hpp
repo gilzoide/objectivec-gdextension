@@ -19,38 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJECTIVEC_HPP__
-#define __OBJECTIVEC_HPP__
+#ifndef __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
+#define __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
 
-#include <godot_cpp/classes/ref_counted.hpp>
+#import <Foundation/Foundation.h>
+
+#include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
 
-namespace objcgdextension {
+@interface NSMethodSignature (ArgumentsFromData)
 
-class ObjectiveCClass;
-class ObjectiveCObject;
+- (NSUInteger)totalArgumentSize;
+- (Array)arrayFromArgumentData:(const void *)data;
 
-class ObjectiveCAPI : public RefCounted {
-	GDCLASS(ObjectiveCAPI, RefCounted);
+@end
 
-public:
-	ObjectiveCAPI();
-
-	ObjectiveCClass *find_class(const String& name) const;
-	ObjectiveCObject *create_block(const String& objCTypes, const Callable& implementation) const;
-	
-	static ObjectiveCAPI *get_singleton();
-
-protected:
-	static void _bind_methods();
-
-	bool _get(const StringName& name, Variant& r_value);
-
-private:
-	static ObjectiveCAPI *instance;
-};
-
-}
-
-#endif  // __OBJECTIVEC_HPP__
+#endif  //  __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__

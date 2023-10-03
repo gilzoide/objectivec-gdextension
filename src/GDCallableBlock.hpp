@@ -19,38 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJECTIVEC_HPP__
-#define __OBJECTIVEC_HPP__
+#ifndef __GDCALLABLE_BLOCK_HPP__
+#define __GDCALLABLE_BLOCK_HPP__
 
-#include <godot_cpp/classes/ref_counted.hpp>
+#include <Foundation/Foundation.h>
+
+#include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
 
-namespace objcgdextension {
-
-class ObjectiveCClass;
-class ObjectiveCObject;
-
-class ObjectiveCAPI : public RefCounted {
-	GDCLASS(ObjectiveCAPI, RefCounted);
-
-public:
-	ObjectiveCAPI();
-
-	ObjectiveCClass *find_class(const String& name) const;
-	ObjectiveCObject *create_block(const String& objCTypes, const Callable& implementation) const;
-	
-	static ObjectiveCAPI *get_singleton();
-
-protected:
-	static void _bind_methods();
-
-	bool _get(const StringName& name, Variant& r_value);
-
-private:
-	static ObjectiveCAPI *instance;
-};
-
+/**
+ * Object that conforms to the block ABI and forwards block invocations to a Godot Callable.
+ *
+ * @note The implementations receive a fixed number of arguments as integers,
+ * so there are no special registers involved. If you pass this to a block that
+ * is invoked with float/double or struct values, your app will likely crash.
+ */
+@interface GDCallableBlock : NSObject
+{
+    int _flags;
+    int _reserved;
+    void *_invoke;
+    void *_descriptor;
+    
+    Callable _callable;
+	NSMethodSignature *_signature;
 }
 
-#endif  // __OBJECTIVEC_HPP__
+@property(readonly) NSMethodSignature *signature;
+
++ (instancetype)blockWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
+- (instancetype)initWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
+
+- (void)invokeWithArgs:(const void *)argsBuffer;
+
+@end
+
+#endif  // __GDCALLABLE_BLOCK_HPP__

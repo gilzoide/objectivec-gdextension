@@ -54,6 +54,87 @@ String format_selector_call(id obj, const String& selector) {
 	);
 }
 
+template<typename T>
+T deref_as(const void *buffer) {
+	return *static_cast<const T *>(buffer);
+}
+
+template<typename T>
+T deref_as(NSInvocation *invocation) {
+	T value;
+	[invocation getReturnValue:&value];
+	return value;
+}
+
+template<typename TDeref>
+Variant to_variant(const char *objc_type, TDeref buffer) {
+	switch (objc_type[0]) {
+		case 'B':
+			return deref_as<bool>(buffer);
+
+		case 'c': {
+			char c = deref_as<char>(buffer);
+			if (c == 0 || c == 1) {
+				return (bool) c;
+			}
+			else {
+				return String::utf8(&c, 1);
+			}
+		}
+		case 'i':
+			return (int64_t) deref_as<int>(buffer);
+		case 's':
+			return (int64_t) deref_as<short>(buffer);
+		case 'l':
+			return (int64_t) deref_as<long>(buffer);
+		case 'q':
+			return (int64_t) deref_as<long long>(buffer);
+
+		case 'C':
+			return (uint64_t) deref_as<unsigned char>(buffer);
+		case 'I':
+			return (uint64_t) deref_as<unsigned int>(buffer);
+		case 'S':
+			return (uint64_t) deref_as<unsigned short>(buffer);
+		case 'L':
+			return (uint64_t) deref_as<unsigned long>(buffer);
+		case 'Q':
+			return (uint64_t) deref_as<unsigned long long>(buffer);
+		
+		case '*':
+			return deref_as<const char *>(buffer);
+		
+		case '@': {
+			NSObject *obj = deref_as<NSObject *>(buffer);
+			return to_variant(obj);
+		}
+
+		case '#': {
+			Class cls = deref_as<Class>(buffer);
+			return memnew(ObjectiveCClass(cls));
+		}
+
+		case ':': {
+			SEL sel = deref_as<SEL>(buffer);
+			return sel_getName(sel);
+		}
+
+		case 'v':
+			return Variant();
+
+		default:
+			ERR_FAIL_V_EDMSG(Variant(), String("Value with Objective-C encoded type '%s' is not supported yet") % String(objc_type));
+	}
+}
+
+Variant to_variant(const char *objc_type, const void *buffer) {
+	return to_variant<const void *>(objc_type, buffer);
+}
+
+Variant result_to_variant(NSInvocation *invocation) {
+	return to_variant<NSInvocation *>(invocation.methodSignature.methodReturnType, invocation);
+}
+
 Variant to_variant(NSObject *obj) {
 	if (obj == nil || obj == NSNull.null) {
 		return Variant();
@@ -198,7 +279,10 @@ NSObject *to_nsobject(const Variant& value) {
 
 		case godot::Variant::OBJECT: {
 			Object *obj = value;
-			if (auto objc_obj = Object::cast_to<ObjectiveCObject>(obj)) {
+			if (!obj) {
+				return nil;
+			}
+			else if (auto objc_obj = Object::cast_to<ObjectiveCObject>(obj)) {
 				return objc_obj->get_obj();
 			}
 			else {

@@ -19,38 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJECTIVEC_HPP__
-#define __OBJECTIVEC_HPP__
+#import "NSMethodSignature+ArgumentsFromData.hpp"
 
-#include <godot_cpp/classes/ref_counted.hpp>
+#include "objc_conversions.hpp"
 
-using namespace godot;
+#include <Foundation/Foundation.h>
+#include <objc/NSObjCRuntime.h>
 
-namespace objcgdextension {
+using namespace objcgdextension;
 
-class ObjectiveCClass;
-class ObjectiveCObject;
+@implementation NSMethodSignature (ArgumentsFromData)
 
-class ObjectiveCAPI : public RefCounted {
-	GDCLASS(ObjectiveCAPI, RefCounted);
-
-public:
-	ObjectiveCAPI();
-
-	ObjectiveCClass *find_class(const String& name) const;
-	ObjectiveCObject *create_block(const String& objCTypes, const Callable& implementation) const;
-	
-	static ObjectiveCAPI *get_singleton();
-
-protected:
-	static void _bind_methods();
-
-	bool _get(const StringName& name, Variant& r_value);
-
-private:
-	static ObjectiveCAPI *instance;
-};
-
+- (NSUInteger)totalArgumentSize {
+	NSUInteger totalSize = 0;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		NSUInteger size, align;
+		NSGetSizeAndAlignment([self getArgumentTypeAtIndex:i], &size, &align);
+		// TODO: consider alignment
+		totalSize += size;
+	}
+	return totalSize;
 }
 
-#endif  // __OBJECTIVEC_HPP__
+- (Array)arrayFromArgumentData:(const void *)data {
+	Array args;
+	const uint8_t *ptr = (const uint8_t *) data;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		const char *type = [self getArgumentTypeAtIndex:i];
+		args.append(to_variant(type, ptr));
+		NSUInteger size, align;
+		NSGetSizeAndAlignment(type, &size, &align);
+		// TODO: consider alignment
+		ptr += size;
+	}
+	return args;
+}
+
+@end

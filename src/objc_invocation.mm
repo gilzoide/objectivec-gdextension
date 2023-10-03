@@ -26,11 +26,9 @@
 #include "objc_conversions.hpp"
 
 #include <Foundation/Foundation.h>
-#include <objc/runtime.h>
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/error_macros.hpp>
-#include <godot_cpp/variant/char_string.hpp>
 
 namespace objcgdextension {
 
@@ -99,9 +97,8 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 		}
 			
 		case '#': {
-			ObjectiveCObject *obj;
-			if (value.get_type() == Variant::OBJECT && (obj = Object::cast_to<ObjectiveCObject>(value))) {
-				return set_argument(buffer, invocation, arg_number, obj->get_obj());
+			if (ObjectiveCClass *gdcls = Object::cast_to<ObjectiveCClass>(value)) {
+				return set_argument(buffer, invocation, arg_number, gdcls->get_obj());
 			}
 			else {
 				Class cls = class_from_string(value);
@@ -109,17 +106,12 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 			}
 		}
 
+		case '*':
+			// TODO: support 'const char *' arguments
 		default:
 			ERR_FAIL_V_MSG(0, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(type));
 	}
 	return 0;
-}
-
-template<typename TIn, typename TOut>
-Variant to_variant(NSInvocation *invoked_invocation) {
-	TIn value;
-	[invoked_invocation getReturnValue:&value];
-	return (TOut) value;
 }
 
 Variant invoke(id obj, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
@@ -138,10 +130,11 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 		String("Invalid call to %s: expected %d arguments, found %d") % Array::make(format_selector_call(obj, selector), expected_argc, argc)
 	);
 
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-	invocation.target = obj;
-	invocation.selector = sel;
 	@autoreleasepool {
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+		invocation.target = obj;
+		invocation.selector = sel;
+
 		PackedByteArray buffer_holder;
 		buffer_holder.resize(signature.frameLength);
 		uint8_t *buffer = buffer_holder.ptrw();
@@ -150,60 +143,7 @@ Variant invoke(id obj, const godot::String& selector, const godot::Variant **arg
 		}
 		[invocation invoke];
 
-		const char *return_type = signature.methodReturnType;
-		switch (return_type[0]) {
-			case 'B':
-				return to_variant<bool, bool>(invocation);
-
-			case 'c': {
-				char c;
-				[invocation getReturnValue:&c];
-				if (c == 0 || c == 1) {
-					return (bool) c;
-				}
-				else {
-					return String::utf8(&c, 1);
-				}
-			}
-			case 'i':
-				return to_variant<int, int64_t>(invocation);
-			case 's':
-				return to_variant<short, int64_t>(invocation);
-			case 'l':
-				return to_variant<long, int64_t>(invocation);
-			case 'q':
-				return to_variant<long long, int64_t>(invocation);
-
-			case 'C':
-				return to_variant<unsigned char, int64_t>(invocation);
-			case 'I':
-				return to_variant<unsigned int, uint64_t>(invocation);
-			case 'S':
-				return to_variant<unsigned short, uint64_t>(invocation);
-			case 'L':
-				return to_variant<unsigned long, uint64_t>(invocation);
-			case 'Q':
-				return to_variant<unsigned long long, uint64_t>(invocation);
-			
-			case '@': {
-				id result;
-				[invocation getReturnValue:&result];
-				[result retain];
-				return to_variant((NSObject *) result);
-			}
-
-			case '#': {
-				Class result;
-				[invocation getReturnValue:&result];
-				return memnew(ObjectiveCClass(result));
-			}
-
-			case 'v':
-				return Variant();
-
-			default:
-				ERR_FAIL_V_EDMSG(Variant(), String("Return value with Objective-C encoded type '%s' is not supported yet") % String(return_type));
-		}
+		return result_to_variant(invocation);
 	}
 }
 
