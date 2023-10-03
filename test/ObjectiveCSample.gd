@@ -15,19 +15,28 @@ func _ready():
 	match OS.get_name():
 		# Let's show a macOS native alert
 		"macOS":
-			# 3.1. Get the Objective-C class by name
+			# 3.1. Get the Objective-C classes by name
 			var NSAlert = ObjectiveC.NSAlert
+			var NSApplication = ObjectiveC.NSApplication
 
 			# 3.2. Alloc and init objects
 			var alert = NSAlert.alloc("init")
 
 			# 3.3. Get and set values normally
-			# Note that property names must match Objective-C ones
+			# Note that property names must match the ones in Objective-C.
+			# Note also that class properties work just as well.
 			alert.messageText = ALERT_TITLE
 			alert.informativeText = ALERT_BODY
+			var window = NSApplication.sharedApplication.keyWindow
 
-			# 3.4. Send messages
-			alert.perform_selector("runModal")
+			# 3.4. Create blocks from Callable values
+			# Note that you need to specify the Objective-C method signature,
+			# since Callables don't have static typing, but blocks to.
+			var alert_completion = func(): print("Alert dismissed!")
+			var alert_completion_block = ObjectiveC.create_block("v", alert_completion)
+
+			# 3.5. Send messages
+			alert.perform_selector("beginSheetModalForWindow:completionHandler:", window, alert_completion_block)
 
 		# Ok, let's try again with iOS alerts
 		"iOS":
@@ -36,17 +45,20 @@ func _ready():
 			var UIAlertAction = ObjectiveC.UIAlertAction
 			var UIApplication = ObjectiveC.UIApplication
 
-			# 3.2. Alloc and init objects
+			# 3.2. Create blocks from Callable values
+			var alert_completion = func(): print("Alert dismissed!")
+			var alert_completion_block = ObjectiveC.create_block("v", alert_completion)
+
+			# 3.3. Alloc and init objects
 			# Some classes provide factory methods to construct objects.
 			# Note that Objective-C classes are also regular Objective-C
 			# objects, so you can message them as well.
 			var alert = UIAlertController.perform_selector("alertControllerWithTitle:message:preferredStyle:", ALERT_TITLE, ALERT_BODY, 1)
-			var ok_action = UIAlertAction.perform_selector("actionWithTitle:style:handler:", "Ok", 0, null)
+			var ok_action = UIAlertAction.perform_selector("actionWithTitle:style:handler:", "Ok", 0, alert_completion_block)
 
-			# 3.3. Get and set values normally
-			# Classes are also supported, since they are also objects.
+			# 3.4. Get and set values normally
 			var view_controller = UIApplication.sharedApplication.delegate.window.rootViewController
 
-			# 3.4. Send messages
+			# 3.5. Send messages
 			alert.perform_selector("addAction:", ok_action)
 			view_controller.perform_selector("presentViewController:animated:completion:", alert, true, null)
