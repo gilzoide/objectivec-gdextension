@@ -24,13 +24,15 @@ Use at your own risk.
 - `to_array` method for converting Objective-C objects that support enumeration, like `NSArray` and `NSSet`, to Godot `Array`
 - `to_dictionary` method for converting Objective-C objects that support enumeration and the `objectForKey:` message, like `NSDictionary`, to Godot `Dictionary`
 - Other useful methods, like `is_kind_of_class`, `responds_to_selector` and `conforms_to_protocol`
+- Supports creating blocks from a `Callable` and the corresponding Objective-C method signature
 
 
 ## Caveats
 - Currently only supports macOS and iOS.
   In multiplatform projects, you must check if you are in a supported platform before trying to use the API.
 - This plugin makes its best to check for type compatibility between Godot and Objective-C and catch exceptions when sending messages, but it is possible for crashes to happen if the library is misused.
-- For now, there is no support for structs, blocks and pointers in general.
+- Block invocation uses fixed integer arguments, so blocks with different call ABI, for example blocks called with float or double values, may crash.
+- For now, there is no support for structs and pointers as arguments or return values.
 
 
 ## How to use
