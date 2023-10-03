@@ -22,8 +22,6 @@
 #ifndef __OBJC_INVOCATION_HPP__
 #define __OBJC_INVOCATION_HPP__
 
-#include <Foundation/Foundation.h>
-
 #include <gdextension_interface.h>
 #include <godot_cpp/variant/variant.hpp>
 

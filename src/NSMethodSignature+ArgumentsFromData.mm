@@ -22,7 +22,6 @@
 #import "NSMethodSignature+ArgumentsFromData.hpp"
 
 #include "objc_conversions.hpp"
-#include "ObjectiveCClass.hpp"
 
 #include <Foundation/Foundation.h>
 #include <objc/NSObjCRuntime.h>
@@ -42,14 +41,15 @@ using namespace objcgdextension;
 	return totalSize;
 }
 
-- (Array)arrayFromArgumentData:(NSData *)data {
+- (Array)arrayFromArgumentData:(const void *)data {
 	Array args;
-	const uint8_t *ptr = (const uint8_t *) data.bytes;
+	const uint8_t *ptr = (const uint8_t *) data;
 	for (int i = 0; i < self.numberOfArguments; i++) {
 		const char *type = [self getArgumentTypeAtIndex:i];
 		args.append(to_variant(type, ptr));
 		NSUInteger size, align;
 		NSGetSizeAndAlignment(type, &size, &align);
+		// TODO: consider alignment
 		ptr += size;
 	}
 	return args;

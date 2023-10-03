@@ -44,7 +44,7 @@ using namespace godot;
 + (instancetype)blockWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
 - (instancetype)initWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
 
-- (void)invokeWithArgs:(NSData *)argsData;
+- (void)invokeWithArgs:(const void *)argsBuffer;
 
 @end
 

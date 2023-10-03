@@ -21,14 +21,9 @@
  */
 #include "GDCallableBlock.hpp"
 
-#include "objc_invocation.hpp"
 #include "NSMethodSignature+ArgumentsFromData.hpp"
 
-#include <array>
-#include <objc/NSObjCRuntime.h>
 #include <objc/runtime.h>
-
-using namespace objcgdextension;
 
 struct GDCallableBlockDescriptor {
     unsigned long reserved;
@@ -40,17 +35,17 @@ template<typename... Args>
 void invoke_block(GDCallableBlock *block, Args... args) {
 	// Objective-C runtime resets `isa` when copying the block, for some reason
 	object_setClass(block, GDCallableBlock.class);
-	NSMutableData *data = [NSMutableData data];
-	([data appendBytes:&args length:sizeof(args)], ...);
-	[block invokeWithArgs:data];
+	PackedInt64Array args_buffer;
+	(args_buffer.append(args), ...);
+	[block invokeWithArgs:args_buffer.ptr()];
 }
 
 constexpr std::array<void *, 5> invoke_methods = {
 	(void *) &invoke_block<>,
-	(void *) &invoke_block<NSUInteger>,
-	(void *) &invoke_block<NSUInteger, NSUInteger>,
-	(void *) &invoke_block<NSUInteger, NSUInteger, NSUInteger>,
-	(void *) &invoke_block<NSUInteger, NSUInteger, NSUInteger, NSUInteger>
+	(void *) &invoke_block<int64_t>,
+	(void *) &invoke_block<int64_t, int64_t>,
+	(void *) &invoke_block<int64_t, int64_t, int64_t>,
+	(void *) &invoke_block<int64_t, int64_t, int64_t, int64_t>
 };
 
 @implementation GDCallableBlock
@@ -76,8 +71,8 @@ constexpr std::array<void *, 5> invoke_methods = {
 	return self;
 }
 
-- (void)invokeWithArgs:(NSData *)argsData {
-	Array args = [_signature arrayFromArgumentData:argsData];
+- (void)invokeWithArgs:(const void *)argsBuffer {
+	Array args = [_signature arrayFromArgumentData:argsBuffer];
 	Variant result = _callable.callv(args);
 }
 

@@ -19,7 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#ifndef __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
+#define __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
 
 #import <Foundation/Foundation.h>
 
@@ -30,6 +31,8 @@ using namespace godot;
 @interface NSMethodSignature (ArgumentsFromData)
 
 - (NSUInteger)totalArgumentSize;
-- (Array)arrayFromArgumentData:(NSData *)data;
+- (Array)arrayFromArgumentData:(const void *)data;
 
 @end
+
+#endif  //  __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__

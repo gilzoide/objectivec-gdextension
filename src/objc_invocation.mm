@@ -26,7 +26,6 @@
 #include "objc_conversions.hpp"
 
 #include <Foundation/Foundation.h>
-#include <objc/runtime.h>
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/error_macros.hpp>
