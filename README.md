@@ -35,6 +35,15 @@ Use at your own risk.
 - For now, there is no support for structs and pointers as arguments or return values.
 
 
+## How to install
+1. Go to the [Actions](https://github.com/gilzoide/objc-gdextension/actions) tab
+2. Open the last successful build, or another successful one that targets the branch/commit you want to use
+3. Download the "objc-gdextension" artifact
+4. Extract it into your project
+5. Open the Godot editor at least once after installing the extension
+6. Enjoy 🍾
+
+
 ## How to use
 ```gdscript
 extends Node
@@ -104,12 +113,3 @@ func _ready():
 ```
 <img src="extras/hello_from_godot.png" height="256" alt="Native macOS alert window showing the message text set via GDScript" />
 <img src="extras/hello_from_godot-ios.png" height="256" alt="Native iOS alert window showing the message text set via GDScript" />
-
-
-## How to install
-1. Go to the [Actions](https://github.com/gilzoide/objc-gdextension/actions) tab
-2. Open the last successful build, or another successful one that targets the branch/commit you want to use
-3. Download the "objc-gdextension" artifact
-4. Extract it into your project
-5. Open the Godot editor at least once after installing the extension
-6. Enjoy 🍾
