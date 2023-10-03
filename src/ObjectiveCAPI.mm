@@ -54,7 +54,7 @@ ObjectiveCObject *ObjectiveCAPI::create_block(const String& objCTypes, const Cal
 		return memnew(ObjectiveCObject([GDCallableBlock blockWithCallable:implementation signature:signature]));
 	}
 	@catch (NSException *ex) {
-		ERR_FAIL_V_MSG(NULL, String("Invalid type encoding '%s': %s") % Array::make(objCTypes, String(ex.description.UTF8String)));
+		ERR_FAIL_V_MSG(NULL, String("Invalid Objective-C type encoding '%s': %s") % Array::make(objCTypes, String(ex.description.UTF8String)));
 	}
 }
 

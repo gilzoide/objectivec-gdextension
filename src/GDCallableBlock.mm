@@ -31,13 +31,15 @@ struct GDCallableBlockDescriptor {
 };
 static GDCallableBlockDescriptor BLOCK_DESCRIPTOR = { 0, class_getInstanceSize(GDCallableBlock.class) };
 
+static auto GDCallableBlock_invokeWithArgs_imp = (void (*)(id, SEL, const void *)) class_getMethodImplementation(GDCallableBlock.class, @selector(invokeWithArgs:));
+
 template<typename... Args>
 void invoke_block(GDCallableBlock *block, Args... args) {
-	// Objective-C runtime resets `isa` when copying the block, for some reason
-	object_setClass(block, GDCallableBlock.class);
 	PackedInt64Array args_buffer;
 	(args_buffer.append(args), ...);
-	[block invokeWithArgs:args_buffer.ptr()];
+	// Objective-C runtime resets `isa` when copying the block, for some reason
+	// Just call the method via its IMP instead of messaging
+	GDCallableBlock_invokeWithArgs_imp(block, @selector(invokeWithArgs:), args_buffer.ptr());
 }
 
 constexpr std::array<void *, 5> invoke_methods = {
@@ -45,7 +47,7 @@ constexpr std::array<void *, 5> invoke_methods = {
 	(void *) &invoke_block<int64_t>,
 	(void *) &invoke_block<int64_t, int64_t>,
 	(void *) &invoke_block<int64_t, int64_t, int64_t>,
-	(void *) &invoke_block<int64_t, int64_t, int64_t, int64_t>
+	(void *) &invoke_block<int64_t, int64_t, int64_t, int64_t>,
 };
 
 @implementation GDCallableBlock
@@ -57,9 +59,8 @@ constexpr std::array<void *, 5> invoke_methods = {
 - (instancetype)initWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature {
 	if (self = [super init]) {
 		_flags = 0;
-		NSUInteger totalSize = signature.totalArgumentSize;
-		if (int index = totalSize / invoke_methods.size(); index < invoke_methods.size()) {
-			_invoke = invoke_methods[index];
+		if (int implementationIndex = signature.totalArgumentSize / invoke_methods.size(); implementationIndex < invoke_methods.size()) {
+			_invoke = invoke_methods[implementationIndex];
 		}
 		else {
 			@throw [NSException exceptionWithName:@"InvalidSignatureException" reason:@"Too many arguments" userInfo:nil];
@@ -74,6 +75,10 @@ constexpr std::array<void *, 5> invoke_methods = {
 - (void)invokeWithArgs:(const void *)argsBuffer {
 	Array args = [_signature arrayFromArgumentData:argsBuffer];
 	Variant result = _callable.callv(args);
+}
+
+- (NSMethodSignature *)signature {
+	return _signature;
 }
 
 - (instancetype)copyWithZone:(NSZone *)zone {

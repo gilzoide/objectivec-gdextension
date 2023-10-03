@@ -28,8 +28,13 @@
 
 using namespace godot;
 
-// Reference: https://www.mikeash.com/pyblog/friday-qa-2011-10-28-generic-block-proxying.html
-// https://github.com/mikeash/MABlockForwarding
+/**
+ * Object that conforms to the block ABI and forwards block invocations to a Godot Callable.
+ *
+ * @note The implementations receive a fixed number of arguments as integers,
+ * so there are no special registers involved. If you pass this to a block that
+ * is invoked with float/double or struct values, your app will likely crash.
+ */
 @interface GDCallableBlock : NSObject
 {
     int _flags;
@@ -40,6 +45,8 @@ using namespace godot;
     Callable _callable;
 	NSMethodSignature *_signature;
 }
+
+@property(readonly) NSMethodSignature *signature;
 
 + (instancetype)blockWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
 - (instancetype)initWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature;
