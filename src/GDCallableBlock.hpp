@@ -19,8 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJECTIVEC_BLOCK_HPP__
-#define __OBJECTIVEC_BLOCK_HPP__
+#ifndef __GDCALLABLE_BLOCK_HPP__
+#define __GDCALLABLE_BLOCK_HPP__
 
 #include <Foundation/Foundation.h>
 
@@ -55,4 +55,4 @@ using namespace godot;
 
 @end
 
-#endif  // __OBJECTIVEC_BLOCK_HPP__
+#endif  // __GDCALLABLE_BLOCK_HPP__
