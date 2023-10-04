@@ -22,6 +22,7 @@
 #include "objc_marshalling.hpp"
 
 #include "ObjectiveCClass.hpp"
+#include "ObjectiveCPointer.hpp"
 #include "objc_conversions.hpp"
 
 namespace objcgdextension {
@@ -146,6 +147,12 @@ Variant get_variant(const char *objc_type, TDeref buffer) {
 
 		case 'v':
 			return Variant();
+
+		case '^': {
+			void *pointer = deref_as<void *>(buffer);
+			const char *element_type = skip_method_encodings(objc_type + 1);
+			return memnew(ObjectiveCPointer(element_type, pointer));
+		}
 
 		default:
 			ERR_FAIL_V_EDMSG(Variant(), String("Value with Objective-C encoded type '%s' is not supported yet") % String(objc_type));
