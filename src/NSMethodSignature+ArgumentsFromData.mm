@@ -23,9 +23,6 @@
 
 #include "objc_marshalling.hpp"
 
-#include <Foundation/Foundation.h>
-#include <objc/NSObjCRuntime.h>
-
 using namespace objcgdextension;
 
 @implementation NSMethodSignature (ArgumentsFromData)

@@ -19,20 +19,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_MARSHALLING_HPP__
-#define __OBJC_MARSHALLING_HPP__
+#ifndef __OBJECTIVEC_POINTER_HPP__
+#define __OBJECTIVEC_POINTER_HPP__
 
 #include <Foundation/Foundation.h>
-#include <godot_cpp/variant/variant.hpp>
+#include <godot_cpp/classes/ref_counted.hpp>
 
 using namespace godot;
 
 namespace objcgdextension {
 
-Variant get_variant(const char *objc_type, const void *buffer);
-Variant get_result_variant(NSInvocation *invocation);
-bool set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder);
+class ObjectiveCPointer : public RefCounted {
+	GDCLASS(ObjectiveCPointer, RefCounted);
+
+public:
+	ObjectiveCPointer();
+	ObjectiveCPointer(const char *objc_element_type, void *ptr);
+
+	void *get_pointer(int64_t index = 0) const;
+	bool is_null() const;
+	uint64_t get_element_size() const;
+	String get_element_type() const;
+
+	ObjectiveCPointer *offset(int64_t index) const;
+
+	bool set_value(const Variant& value, int64_t index = 0);
+	Variant get_value(int64_t index = 0) const;
+
+protected:
+	static void _bind_methods();
+
+	String _to_string();
+
+	void *pointer;
+	const char *element_type;
+	NSUInteger element_size;
+};
 
 }
 
-#endif  // __OBJC_MARSHALLING_HPP__
+#endif  // __OBJECTIVEC_POINTER_HPP__

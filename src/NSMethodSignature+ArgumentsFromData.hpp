@@ -22,8 +22,7 @@
 #ifndef __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
 #define __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
 
-#import <Foundation/Foundation.h>
-
+#include <Foundation/Foundation.h>
 #include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;

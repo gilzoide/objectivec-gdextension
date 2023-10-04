@@ -22,6 +22,7 @@
 #include "objc_marshalling.hpp"
 
 #include "ObjectiveCClass.hpp"
+#include "ObjectiveCPointer.hpp"
 #include "objc_conversions.hpp"
 
 namespace objcgdextension {
@@ -147,6 +148,12 @@ Variant get_variant(const char *objc_type, TDeref buffer) {
 		case 'v':
 			return Variant();
 
+		case '^': {
+			void *pointer = deref_as<void *>(buffer);
+			const char *element_type = skip_method_encodings(objc_type + 1);
+			return memnew(ObjectiveCPointer(element_type, pointer));
+		}
+
 		default:
 			ERR_FAIL_V_EDMSG(Variant(), String("Value with Objective-C encoded type '%s' is not supported yet") % String(objc_type));
 	}
@@ -161,11 +168,12 @@ Variant get_result_variant(NSInvocation *invocation) {
 }
 
 template<typename T>
-void set_value(void *buffer, const T& value) {
+bool set_value(void *buffer, const T& value) {
 	*static_cast<T *>(buffer) = value;
+	return true;
 }
 
-void set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder) {
+bool set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder) {
 	objc_type = skip_method_encodings(objc_type);
 	switch (objc_type[0]) {
 		case 'B':
@@ -218,8 +226,27 @@ void set_variant(const char *objc_type, void *buffer, const Variant& value, Arra
 			return set_value(buffer, chars.ptr());
 		}
 
+		case '^': {
+			switch (value.get_type()) {
+				case Variant::NIL: {
+					return set_value(buffer, (id *) nullptr);
+				}
+				case Variant::PACKED_BYTE_ARRAY: {
+					PackedByteArray byte_array = value;
+					return set_value(buffer, byte_array.ptr());
+				}
+				case Variant::OBJECT: {
+					if (ObjectiveCPointer *pointer = Object::cast_to<ObjectiveCPointer>(value)) {
+						return set_value(buffer, pointer->get_pointer());
+					}
+				}
+				default:
+					ERR_FAIL_V_MSG(false, String("Objective-C pointer with encoded type '%s' expected null, PackedByteArray or ObjectiveCPointer, got %s") % Array::make(String(objc_type), Variant::get_type_name(value.get_type())));
+			}
+		}
+
 		default:
-			ERR_FAIL_MSG(String("Argument with Objective-C encoded type '%s' is not support yet.") % String(objc_type));
+			ERR_FAIL_V_MSG(false, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(objc_type));
 	}
 }
 
