@@ -161,11 +161,12 @@ Variant get_result_variant(NSInvocation *invocation) {
 }
 
 template<typename T>
-void set_value(void *buffer, const T& value) {
+bool set_value(void *buffer, const T& value) {
 	*static_cast<T *>(buffer) = value;
+	return true;
 }
 
-void set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder) {
+bool set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder) {
 	objc_type = skip_method_encodings(objc_type);
 	switch (objc_type[0]) {
 		case 'B':
@@ -228,12 +229,12 @@ void set_variant(const char *objc_type, void *buffer, const Variant& value, Arra
 					return set_value(buffer, byte_array.ptr());
 				}
 				default:
-					ERR_FAIL_MSG(String("Objective-C pointer with encoded type '%s' expected null or PackedByteArray, got %s") % Array::make(String(objc_type), Variant::get_type_name(value.get_type())));
+					ERR_FAIL_V_MSG(false, String("Objective-C pointer with encoded type '%s' expected null or PackedByteArray, got %s") % Array::make(String(objc_type), Variant::get_type_name(value.get_type())));
 			}
 		}
 
 		default:
-			ERR_FAIL_MSG(String("Argument with Objective-C encoded type '%s' is not support yet.") % String(objc_type));
+			ERR_FAIL_V_MSG(false, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(objc_type));
 	}
 }
 

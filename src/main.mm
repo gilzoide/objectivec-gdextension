@@ -22,6 +22,7 @@
 #include "ObjectiveCAPI.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
+#include "ObjectiveCPointer.hpp"
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -38,6 +39,7 @@ static void initialize(ModuleInitializationLevel level) {
 	ClassDB::register_abstract_class<ObjectiveCObject>();
 	ClassDB::register_abstract_class<ObjectiveCClass>();
 	ClassDB::register_abstract_class<ObjectiveCAPI>();
+	ClassDB::register_abstract_class<ObjectiveCPointer>();
 	Engine::get_singleton()->register_singleton("ObjectiveC", memnew(ObjectiveCAPI));
 }
 
