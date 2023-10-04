@@ -66,8 +66,9 @@ int set_argument(void *buffer, NSInvocation *invocation, int arg_number, const T
 	return sizeof(T);
 }
 
-int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const Variant& value) {
+int setup_argument(void *buffer, Array& string_holder, NSInvocation *invocation, int arg_number, const Variant& value) {
 	const char *type = [invocation.methodSignature getArgumentTypeAtIndex:arg_number];
+	type = skip_method_encodings(type);
 	switch (type[0]) {
 		case 'B':
 		case 'c':
@@ -106,8 +107,19 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 			}
 		}
 
-		case '*':
-			// TODO: support 'const char *' arguments
+		case '*': {
+			PackedByteArray chars;
+			if (value.get_type() == Variant::PACKED_BYTE_ARRAY) {
+				chars = value;
+			}
+			else {
+				chars = value.stringify().to_utf8_buffer();
+				chars.append(0);
+				string_holder.append(chars);
+			}
+			return set_argument(buffer, invocation, arg_number, chars.ptr());
+		}
+			
 		default:
 			ERR_FAIL_V_MSG(0, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(type));
 	}
@@ -134,11 +146,13 @@ NSInvocation *prepare_and_invoke(id target, const String& selector, const godot:
 	invocation.target = target;
 	invocation.selector = sel;
 
-	PackedByteArray buffer_holder;
-	buffer_holder.resize(signature.frameLength);
-	uint8_t *buffer = buffer_holder.ptrw();
+	Array string_holder;
+	PackedInt64Array args_buffer;
+	args_buffer.resize(signature.numberOfArguments);
+	uint64_t *buffer = (uint64_t *) args_buffer.ptrw();
 	for (int i = 0; i < argc; i++) {
-		buffer += setup_argument(buffer, invocation, i + 2, *argv[i]);
+		setup_argument(buffer, string_holder, invocation, i + 2, *argv[i]);
+		buffer++;
 	}
 	[invocation invoke];
 

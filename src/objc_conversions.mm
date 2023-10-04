@@ -54,6 +54,22 @@ String format_selector_call(id obj, const String& selector) {
 	);
 }
 
+inline BOOL is_method_encoding(char c) {
+	return c == 'r'
+		|| c == 'n'
+		|| c == 'N'
+		|| c == 'o'
+		|| c == 'O'
+		|| c == 'R'
+		|| c == 'V';
+}
+const char *skip_method_encodings(const char *type) {
+	while (is_method_encoding(type[0])) {
+		type++;
+	}
+	return type;
+}
+
 template<typename T>
 T deref_as(const void *buffer) {
 	return *static_cast<const T *>(buffer);
@@ -68,6 +84,7 @@ T deref_as(NSInvocation *invocation) {
 
 template<typename TDeref>
 Variant to_variant(const char *objc_type, TDeref buffer) {
+	objc_type = skip_method_encodings(objc_type);
 	switch (objc_type[0]) {
 		case 'B':
 			return deref_as<bool>(buffer);
