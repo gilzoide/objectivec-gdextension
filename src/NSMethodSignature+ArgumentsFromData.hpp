@@ -32,6 +32,7 @@ using namespace godot;
 
 - (NSUInteger)totalArgumentSize;
 - (Array)arrayFromArgumentData:(const void *)data;
+- (const char *)getArgumentTypeAtIndex:(NSUInteger)index skippingMethodEncodings:(BOOL)skip NS_RETURNS_INNER_POINTER;
 
 @end
 
