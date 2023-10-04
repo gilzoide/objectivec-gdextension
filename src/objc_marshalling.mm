@@ -235,8 +235,13 @@ bool set_variant(const char *objc_type, void *buffer, const Variant& value, Arra
 					PackedByteArray byte_array = value;
 					return set_value(buffer, byte_array.ptr());
 				}
+				case Variant::OBJECT: {
+					if (ObjectiveCPointer *pointer = Object::cast_to<ObjectiveCPointer>(value)) {
+						return set_value(buffer, pointer->get_pointer());
+					}
+				}
 				default:
-					ERR_FAIL_V_MSG(false, String("Objective-C pointer with encoded type '%s' expected null or PackedByteArray, got %s") % Array::make(String(objc_type), Variant::get_type_name(value.get_type())));
+					ERR_FAIL_V_MSG(false, String("Objective-C pointer with encoded type '%s' expected null, PackedByteArray or ObjectiveCPointer, got %s") % Array::make(String(objc_type), Variant::get_type_name(value.get_type())));
 			}
 		}
 
