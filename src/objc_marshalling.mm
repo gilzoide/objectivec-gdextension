@@ -218,6 +218,20 @@ void set_variant(const char *objc_type, void *buffer, const Variant& value, Arra
 			return set_value(buffer, chars.ptr());
 		}
 
+		case '^': {
+			switch (value.get_type()) {
+				case Variant::NIL: {
+					return set_value(buffer, (id *) nullptr);
+				}
+				case Variant::PACKED_BYTE_ARRAY: {
+					PackedByteArray byte_array = value;
+					return set_value(buffer, byte_array.ptr());
+				}
+				default:
+					ERR_FAIL_MSG(String("Objective-C pointer with encoded type '%s' expected null or PackedByteArray, got %s") % Array::make(String(objc_type), Variant::get_type_name(value.get_type())));
+			}
+		}
+
 		default:
 			ERR_FAIL_MSG(String("Argument with Objective-C encoded type '%s' is not support yet.") % String(objc_type));
 	}
