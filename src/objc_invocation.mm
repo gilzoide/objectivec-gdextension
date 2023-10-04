@@ -24,6 +24,7 @@
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 #include "objc_conversions.hpp"
+#include "objc_marshalling.hpp"
 
 #include <Foundation/Foundation.h>
 
@@ -31,100 +32,6 @@
 #include <godot_cpp/core/error_macros.hpp>
 
 namespace objcgdextension {
-
-/**
- Objective-C type encodings
-	c	A char
-	i	An int
-	s	A short
-	l	A longl is treated as a 32-bit quantity on 64-bit programs.
-	q	A long long
-	C	An unsigned char
-	I	An unsigned int
-	S	An unsigned short
-	L	An unsigned long
-	Q	An unsigned long long
-	f	A float
-	d	A double
-	B	A C++ bool or a C99 _Bool
-	v	A void
-	*	A character string (char *)
-	@	An object (whether statically typed or typed id)
-	#	A class object (Class)
-	:	A method selector (SEL)
-	[array type]	An array
-	{name=type...}	A structure
-	(name=type...)	A union
-	bnum	A bit field of num bits
-	^type	A pointer to type
- */
-
-template<typename T>
-int set_argument(void *buffer, NSInvocation *invocation, int arg_number, const T& value) {
-	*((T *) buffer) = value;
-	[invocation setArgument:buffer atIndex:arg_number];
-	return sizeof(T);
-}
-
-int setup_argument(void *buffer, Array& string_holder, NSInvocation *invocation, int arg_number, const Variant& value) {
-	const char *type = [invocation.methodSignature getArgumentTypeAtIndex:arg_number];
-	type = skip_method_encodings(type);
-	switch (type[0]) {
-		case 'B':
-		case 'c':
-		case 'C':
-		case 'i':
-		case 'I':
-		case 's':
-		case 'S':
-		case 'l':
-		case 'L':
-		case 'q':
-		case 'Q':
-			return set_argument(buffer, invocation, arg_number, (int64_t) value);
-		
-		case 'f':
-		case 'd':
-			return set_argument(buffer, invocation, arg_number, (double) value);
-		
-		case ':': {
-			SEL sel = to_selector(value);
-			return set_argument(buffer, invocation, arg_number, sel);
-		}
-
-		case '@': {
-			NSObject *obj = to_nsobject(value);
-			return set_argument(buffer, invocation, arg_number, obj);
-		}
-			
-		case '#': {
-			if (ObjectiveCClass *gdcls = Object::cast_to<ObjectiveCClass>(value)) {
-				return set_argument(buffer, invocation, arg_number, gdcls->get_obj());
-			}
-			else {
-				Class cls = class_from_string(value);
-				return set_argument(buffer, invocation, arg_number, cls);
-			}
-		}
-
-		case '*': {
-			PackedByteArray chars;
-			if (value.get_type() == Variant::PACKED_BYTE_ARRAY) {
-				chars = value;
-			}
-			else {
-				chars = value.stringify().to_utf8_buffer();
-				chars.append(0);
-				string_holder.append(chars);
-			}
-			return set_argument(buffer, invocation, arg_number, chars.ptr());
-		}
-			
-		default:
-			ERR_FAIL_V_MSG(0, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(type));
-	}
-	return 0;
-}
 
 NSInvocation *prepare_and_invoke(id target, const String& selector, const godot::Variant **argv, GDExtensionInt argc) {
 	SEL sel = to_selector(selector);
@@ -151,7 +58,10 @@ NSInvocation *prepare_and_invoke(id target, const String& selector, const godot:
 	args_buffer.resize(signature.numberOfArguments);
 	uint64_t *buffer = (uint64_t *) args_buffer.ptrw();
 	for (int i = 0; i < argc; i++) {
-		setup_argument(buffer, string_holder, invocation, i + 2, *argv[i]);
+		int arg_number = i + 2;
+		const char *type = [signature getArgumentTypeAtIndex:arg_number];
+		set_variant(type, buffer, *argv[i], string_holder);
+		[invocation setArgument:buffer atIndex:arg_number];
 		buffer++;
 	}
 	[invocation invoke];
@@ -171,7 +81,7 @@ id alloc_init(Class cls, const String& init_selector, const Variant **argv, GDEx
 Variant invoke(id target, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
 	@autoreleasepool {
 		NSInvocation *invocation = prepare_and_invoke(target, selector, argv, argc);
-		return result_to_variant(invocation);
+		return get_result_variant(invocation);
 	}
 }
 

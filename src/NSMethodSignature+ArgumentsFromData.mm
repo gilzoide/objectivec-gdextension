@@ -21,7 +21,7 @@
  */
 #import "NSMethodSignature+ArgumentsFromData.hpp"
 
-#include "objc_conversions.hpp"
+#include "objc_marshalling.hpp"
 
 #include <Foundation/Foundation.h>
 #include <objc/NSObjCRuntime.h>
@@ -46,7 +46,7 @@ using namespace objcgdextension;
 	const uint8_t *ptr = (const uint8_t *) data;
 	for (int i = 0; i < self.numberOfArguments; i++) {
 		const char *type = [self getArgumentTypeAtIndex:i];
-		args.append(to_variant(type, ptr));
+		args.append(get_variant(type, ptr));
 		NSUInteger size, align;
 		NSGetSizeAndAlignment(type, &size, &align);
 		// TODO: consider alignment
