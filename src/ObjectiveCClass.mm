@@ -21,6 +21,7 @@
  */
 #include "ObjectiveCClass.hpp"
 
+#include "ObjectiveCObject.hpp"
 #include "objc_conversions.hpp"
 #include "objc_invocation.hpp"
 
@@ -32,27 +33,28 @@ ObjectiveCClass::ObjectiveCClass() : ObjectiveCObject() {}
 
 ObjectiveCClass::ObjectiveCClass(id obj) : ObjectiveCObject(obj) {}
 
-Variant ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
-	ERR_FAIL_COND_V_EDMSG(!obj, Variant(), "ObjectiveCClass is null");
+ObjectiveCObject *ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
+	ERR_FAIL_COND_V_EDMSG(!obj, nullptr, "ObjectiveCClass is null");
 	if (argc < 1) {
 		error.error = GDEXTENSION_CALL_ERROR_TOO_FEW_ARGUMENTS;
 		error.argument = 1;
-		return Variant();
+		return nullptr;
 	}
 
-	String initSelector = *argv[0];
+	String init_selector = *argv[0];
 	ERR_FAIL_COND_V_MSG(
-		!initSelector.begins_with("init"),
-		Variant(),
-		String("Expected initializer selector to begin with 'init': got '%s'") % initSelector
+		!init_selector.begins_with("init"),
+		nullptr,
+		String("Expected initializer selector to begin with 'init': got '%s'") % init_selector
 	);
 
-	return invoke([obj alloc], initSelector, argv + 1, argc - 1);
+	id instance = alloc_init(obj, init_selector, argv + 1, argc - 1);
+	return memnew(ObjectiveCObject(instance, false));
 }
 
 void ObjectiveCClass::_bind_methods() {
 	{
-		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "initSelector"));
+		MethodInfo mi("alloc", PropertyInfo(Variant::STRING, "init_selector"));
 		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "alloc", &ObjectiveCClass::alloc, mi);
 	}
 }

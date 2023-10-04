@@ -35,7 +35,7 @@ public:
 	ObjectiveCClass();
 	ObjectiveCClass(id obj);
 
-	Variant alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
+	ObjectiveCObject *alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 
 protected:
 	static void _bind_methods();

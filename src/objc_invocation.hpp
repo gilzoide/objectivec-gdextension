@@ -22,6 +22,8 @@
 #ifndef __OBJC_INVOCATION_HPP__
 #define __OBJC_INVOCATION_HPP__
 
+#include <Foundation/Foundation.h>
+
 #include <gdextension_interface.h>
 #include <godot_cpp/variant/variant.hpp>
 
@@ -29,7 +31,8 @@ using namespace godot;
 
 namespace objcgdextension {
 
-Variant invoke(id obj, const String& selector, const Variant **argv, GDExtensionInt argc);
+id alloc_init(Class cls, const String& selector, const Variant **argv, GDExtensionInt argc);
+Variant invoke(id target, const String& selector, const Variant **argv, GDExtensionInt argc);
 
 }
 

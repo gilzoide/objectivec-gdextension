@@ -114,35 +114,49 @@ int setup_argument(void *buffer, NSInvocation *invocation, int arg_number, const
 	return 0;
 }
 
-Variant invoke(id obj, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
+NSInvocation *prepare_and_invoke(id target, const String& selector, const godot::Variant **argv, GDExtensionInt argc) {
 	SEL sel = to_selector(selector);
 	ERR_FAIL_COND_V_EDMSG(
-		![obj respondsToSelector:sel],
-		Variant(),
-		String("Invalid call to %s: selector not supported") % format_selector_call(obj, selector)
+		![target respondsToSelector:sel],
+		nil,
+		String("Invalid call to %s: selector not supported") % format_selector_call(target, selector)
 	);
 
-	NSMethodSignature *signature = [obj methodSignatureForSelector:sel];
+	NSMethodSignature *signature = [target methodSignatureForSelector:sel];
 	int expected_argc = signature.numberOfArguments - 2;
 	ERR_FAIL_COND_V_MSG(
 		expected_argc != argc,
-		Variant(),
-		String("Invalid call to %s: expected %d arguments, found %d") % Array::make(format_selector_call(obj, selector), expected_argc, argc)
+		nil,
+		String("Invalid call to %s: expected %d arguments, found %d") % Array::make(format_selector_call(target, selector), expected_argc, argc)
 	);
 
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+	invocation.target = target;
+	invocation.selector = sel;
+
+	PackedByteArray buffer_holder;
+	buffer_holder.resize(signature.frameLength);
+	uint8_t *buffer = buffer_holder.ptrw();
+	for (int i = 0; i < argc; i++) {
+		buffer += setup_argument(buffer, invocation, i + 2, *argv[i]);
+	}
+	[invocation invoke];
+
+	return invocation;
+}
+
+id alloc_init(Class cls, const String& init_selector, const Variant **argv, GDExtensionInt argc) {
 	@autoreleasepool {
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-		invocation.target = obj;
-		invocation.selector = sel;
+		id instance = [cls alloc];
+		NSInvocation *invocation = prepare_and_invoke(instance, init_selector, argv, argc);
+		[invocation getReturnValue:&instance];
+		return instance;
+	}
+}
 
-		PackedByteArray buffer_holder;
-		buffer_holder.resize(signature.frameLength);
-		uint8_t *buffer = buffer_holder.ptrw();
-		for (int i = 0; i < argc; i++) {
-			buffer += setup_argument(buffer, invocation, i + 2, *argv[i]);
-		}
-		[invocation invoke];
-
+Variant invoke(id target, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
+	@autoreleasepool {
+		NSInvocation *invocation = prepare_and_invoke(target, selector, argv, argc);
 		return result_to_variant(invocation);
 	}
 }

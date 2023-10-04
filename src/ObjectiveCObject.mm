@@ -34,12 +34,12 @@ namespace objcgdextension {
 
 ObjectiveCObject::ObjectiveCObject() : obj() {}
 
-ObjectiveCObject::ObjectiveCObject(id obj) {
-	if (obj) {
-		this->obj = [obj retain];
+ObjectiveCObject::ObjectiveCObject(id instance, bool retain) {
+	if (instance && retain) {
+		obj = [instance retain];
 	}
 	else {
-		obj = nil;
+		obj = instance;
 	}
 }
 

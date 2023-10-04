@@ -34,7 +34,7 @@ class ObjectiveCObject : public RefCounted {
 
 public:
 	ObjectiveCObject();
-	ObjectiveCObject(id obj);
+	ObjectiveCObject(id instance, bool retain = true);
 	~ObjectiveCObject();
 
 	id get_obj();
