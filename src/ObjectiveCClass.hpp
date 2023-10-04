@@ -22,6 +22,8 @@
 #ifndef __OBJECTIVEC_CLASS_HPP__
 #define __OBJECTIVEC_CLASS_HPP__
 
+#include <objc/objc.h>
+
 #include "ObjectiveCObject.hpp"
 
 using namespace godot;
@@ -33,7 +35,7 @@ class ObjectiveCClass : public ObjectiveCObject {
 
 public:
 	ObjectiveCClass();
-	ObjectiveCClass(id obj);
+	ObjectiveCClass(Class cls);
 
 	ObjectiveCObject *alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error);
 

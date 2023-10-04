@@ -31,7 +31,7 @@ namespace objcgdextension {
 
 ObjectiveCClass::ObjectiveCClass() : ObjectiveCObject() {}
 
-ObjectiveCClass::ObjectiveCClass(id obj) : ObjectiveCObject(obj) {}
+ObjectiveCClass::ObjectiveCClass(Class cls) : ObjectiveCObject(cls) {}
 
 ObjectiveCObject *ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {
 	ERR_FAIL_COND_V_EDMSG(!obj, nullptr, "ObjectiveCClass is null");
