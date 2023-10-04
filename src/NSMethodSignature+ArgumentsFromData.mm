@@ -55,23 +55,4 @@ using namespace objcgdextension;
 	return args;
 }
 
-inline BOOL is_method_encoding(char c) {
-	return c == 'r'
-		|| c == 'n'
-		|| c == 'N'
-		|| c == 'o'
-		|| c == 'O'
-		|| c == 'R'
-		|| c == 'V';
-}
-- (const char *)getArgumentTypeAtIndex:(NSUInteger)index skippingMethodEncodings:(BOOL)skipMethodEncodings {
-	const char *type = [self getArgumentTypeAtIndex:index];
-	if (skipMethodEncodings) {
-		while (is_method_encoding(type[0])) {
-			type++;
-		}
-	}
-	return type;
-}
-
 @end

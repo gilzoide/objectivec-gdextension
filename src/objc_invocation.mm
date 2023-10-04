@@ -21,7 +21,6 @@
  */
 #include "objc_invocation.hpp"
 
-#include "NSMethodSignature+ArgumentsFromData.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 #include "objc_conversions.hpp"
@@ -68,7 +67,8 @@ int set_argument(void *buffer, NSInvocation *invocation, int arg_number, const T
 }
 
 int setup_argument(void *buffer, Array& string_holder, NSInvocation *invocation, int arg_number, const Variant& value) {
-	const char *type = [invocation.methodSignature getArgumentTypeAtIndex:arg_number skippingMethodEncodings:YES];
+	const char *type = [invocation.methodSignature getArgumentTypeAtIndex:arg_number];
+	type = skip_method_encodings(type);
 	switch (type[0]) {
 		case 'B':
 		case 'c':

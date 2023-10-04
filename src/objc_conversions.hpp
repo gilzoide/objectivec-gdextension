@@ -35,6 +35,7 @@ Protocol *protocol_from_string(const String& string);
 SEL to_selector(const String& string);
 String format_selector_call(id obj, const String& selector);
 
+const char *skip_method_encodings(const char *type);
 Variant to_variant(const char *objc_type, const void *buffer);
 Variant result_to_variant(NSInvocation *invocation);
 
