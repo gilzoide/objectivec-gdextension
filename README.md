@@ -84,8 +84,8 @@ func _ready():
             var alert_completion = func(): print("Alert dismissed!")
             var alert_completion_block = ObjectiveC.create_block("v", alert_completion)
 
-            # 3.5. Send messages
-            alert.perform_selector("beginSheetModalForWindow:completionHandler:", window, alert_completion_block)
+            # 3.5. Send messages (a.k.a. invoke methods)
+            alert.invoke("beginSheetModalForWindow:completionHandler:", window, alert_completion_block)
 
         # Ok, let's try again with iOS alerts
         "iOS":
@@ -102,15 +102,15 @@ func _ready():
             # Some classes provide factory methods to construct objects.
             # Note that Objective-C classes are also regular Objective-C
             # objects, so you can message them as well.
-            var alert = UIAlertController.perform_selector("alertControllerWithTitle:message:preferredStyle:", ALERT_TITLE, ALERT_BODY, 1)
-            var ok_action = UIAlertAction.perform_selector("actionWithTitle:style:handler:", "Ok", 0, alert_completion_block)
+            var alert = UIAlertController.invoke("alertControllerWithTitle:message:preferredStyle:", ALERT_TITLE, ALERT_BODY, 1)
+            var ok_action = UIAlertAction.invoke("actionWithTitle:style:handler:", "Ok", 0, alert_completion_block)
 
             # 3.4. Get and set values normally
             var view_controller = UIApplication.sharedApplication.delegate.window.rootViewController
 
-            # 3.5. Send messages
-            alert.perform_selector("addAction:", ok_action)
-            view_controller.perform_selector("presentViewController:animated:completion:", alert, true, null)
+            # 3.5. Send messages (a.k.a. invoke methods)
+            alert.invoke("addAction:", ok_action)
+            view_controller.invoke("presentViewController:animated:completion:", alert, true, null)
 ```
 <img src="extras/hello_from_godot.png" height="256" alt="Native macOS alert window showing the message text set via GDScript" />
 <img src="extras/hello_from_godot-ios.png" height="256" alt="Native iOS alert window showing the message text set via GDScript" />

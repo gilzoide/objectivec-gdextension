@@ -124,6 +124,10 @@ void ObjectiveCObject::_bind_methods() {
 		MethodInfo mi("perform_selector", PropertyInfo(Variant::STRING, "selector"));
 		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "perform_selector", &ObjectiveCObject::perform_selector, mi);
 	}
+	{
+		MethodInfo mi("invoke", PropertyInfo(Variant::STRING, "selector"));
+		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "invoke", &ObjectiveCObject::perform_selector, mi);
+	}
 	ClassDB::bind_method(D_METHOD("is_kind_of_class", "class_name"), &ObjectiveCObject::is_kind_of_class);
 	ClassDB::bind_method(D_METHOD("responds_to_selector", "selector"), &ObjectiveCObject::responds_to_selector);
 	ClassDB::bind_method(D_METHOD("conforms_to_protocol", "protocol_name"), &ObjectiveCObject::conforms_to_protocol);
