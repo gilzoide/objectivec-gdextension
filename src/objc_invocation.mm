@@ -73,15 +73,25 @@ id alloc_init(Class cls, const String& init_selector, const Variant **argv, GDEx
 	@autoreleasepool {
 		id instance = [cls alloc];
 		NSInvocation *invocation = prepare_and_invoke(instance, init_selector, argv, argc);
-		[invocation getReturnValue:&instance];
-		return instance;
+		if (invocation) {
+			[invocation getReturnValue:&instance];
+			return instance;
+		}
+		else {
+			return nil;
+		}
 	}
 }
 
 Variant invoke(id target, const godot::String& selector, const godot::Variant **argv, GDExtensionInt argc) {
 	@autoreleasepool {
 		NSInvocation *invocation = prepare_and_invoke(target, selector, argv, argc);
-		return get_result_variant(invocation);
+		if (invocation) {
+			return get_result_variant(invocation);
+		}
+		else {
+			return Variant();
+		}
 	}
 }
 
