@@ -36,15 +36,6 @@ using namespace godot;
  * is invoked with float/double or struct values, your app will likely crash.
  */
 @interface GDCallableBlock : NSObject
-{
-    int _flags;
-    int _reserved;
-    void *_invoke;
-    void *_descriptor;
-    
-    Callable _callable;
-	NSMethodSignature *_signature;
-}
 
 @property(readonly) NSMethodSignature *signature;
 

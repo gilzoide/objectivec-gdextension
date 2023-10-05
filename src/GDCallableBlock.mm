@@ -50,7 +50,15 @@ constexpr std::array<void *, 5> invoke_methods = {
 	(void *) &invoke_block<int64_t, int64_t, int64_t, int64_t>,
 };
 
-@implementation GDCallableBlock
+@implementation GDCallableBlock {
+    int _flags;
+    int _reserved;
+    void *_invoke;
+    void *_descriptor;
+    
+    Callable _callable;
+	NSMethodSignature *_signature;
+}
 
 + (instancetype)blockWithCallable:(const Callable&)callable signature:(NSMethodSignature *)signature {
 	return [[[self alloc] initWithCallable:callable signature:signature] autorelease];
