@@ -19,43 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#import "NSMethodSignature+ArgumentsFromData.hpp"
+#include "NSInvocation+Godot.hpp"
 
 #include "objc_marshalling.hpp"
 
 using namespace objcgdextension;
 
-@implementation NSMethodSignature (ArgumentsFromData)
+@implementation NSInvocation (Godot)
 
-- (NSUInteger)totalArgumentSize {
-	NSUInteger totalSize = 0;
-	for (int i = 0; i < self.numberOfArguments; i++) {
-		NSUInteger size, align;
-		NSGetSizeAndAlignment([self getArgumentTypeAtIndex:i], &size, &align);
-		// TODO: consider alignment
-		totalSize += size;
-	}
-	return totalSize;
-}
-
-- (String)completeSignature {
-	String signature(self.methodReturnType);
-	for (int i = 0; i < self.numberOfArguments; i++) {
-		signature += [self getArgumentTypeAtIndex:i];
-	}
-	return signature;
-}
-
-- (Array)arrayFromArgumentData:(const void *)data {
+- (Array)argumentArray {
 	Array args;
-	const uint8_t *ptr = (const uint8_t *) data;
-	for (int i = 0; i < self.numberOfArguments; i++) {
-		const char *type = [self getArgumentTypeAtIndex:i];
-		args.append(get_variant(type, ptr));
-		NSUInteger size, align;
-		NSGetSizeAndAlignment(type, &size, &align);
-		// TODO: consider alignment
-		ptr += size;
+	for (int i = 2; i < self.methodSignature.numberOfArguments; i++) {
+		args.append(get_argument_variant(self, i));
 	}
 	return args;
 }

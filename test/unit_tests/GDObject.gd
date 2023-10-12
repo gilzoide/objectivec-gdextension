@@ -12,9 +12,22 @@ func test_property() -> bool:
 	return true
 
 
+func test_method() -> bool:
+	var objcObject = ObjectiveC.wrap_object(self)
+	assert(objcObject.invoke("intToBool:", 1) == true)
+	assert(objcObject.invoke("intToBool:", 0) == false)
+	return true
+
+
+func intToBool(value: int) -> bool:
+	return bool(value)
+
+
 func methodSignatureForSelector(sel: String) -> String:
 	match sel:
 		"my_property":
 			return "i@:"
+		"intToBool:":
+			return "B@:i"
 		_:
 			return ""

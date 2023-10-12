@@ -22,6 +22,7 @@
 #include "GDObject.hpp"
 
 #import "NSMethodSignature+ArgumentsFromData.hpp"
+#import "NSInvocation+Godot.hpp"
 #import "objc_conversions.hpp"
 #import "objc_marshalling.hpp"
 
@@ -87,7 +88,7 @@ using namespace objcgdextension;
 	String methodName = [GDObject godotNameForSelector:anInvocation.selector];
 	if (_obj) {
 		if (_obj->has_method(methodName)) {
-			Array args = [anInvocation.methodSignature arrayFromInvocationArguments:anInvocation];
+			Array args = anInvocation.argumentArray;
 			Variant result = _obj->callv(methodName, args);
 			set_result_variant(anInvocation, result, args);
 			return;

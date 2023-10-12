@@ -29,10 +29,10 @@ using namespace godot;
 
 @interface NSMethodSignature (ArgumentsFromData)
 
-- (NSUInteger)totalArgumentSize;
-- (String)completeSignature;
+@property(readonly) NSUInteger totalArgumentSize;
+@property(readonly) String completeSignature;
+
 - (Array)arrayFromArgumentData:(const void *)data;
-- (Array)arrayFromInvocationArguments:(NSInvocation *)invocation;
 
 @end
 
