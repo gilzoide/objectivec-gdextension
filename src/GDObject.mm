@@ -62,9 +62,18 @@ using namespace objcgdextension;
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
 	@try {
 		if (_obj) {
-			String methodSignature = _obj->call("methodSignatureForSelector", to_string(aSelector));
-			if (!methodSignature.is_empty()) {
-				return [NSMethodSignature signatureWithObjCTypes:methodSignature.ascii().get_data()];
+			String ctypes = _obj->call("methodSignatureForSelector", to_string(aSelector));
+			if (!ctypes.is_empty()) {
+				NSMethodSignature *signature = [NSMethodSignature signatureWithObjCTypes:ctypes.ascii().get_data()];
+				if (signature.numberOfArguments >= 2
+					&& [signature getArgumentTypeAtIndex:0][0] == '@'
+					&& [signature getArgumentTypeAtIndex:1][0] == ':'
+				) {
+					return signature;
+				}
+				else {
+					ERR_PRINT(String("Invalid method signature '%s': expected at least target and selector arguments (e.g.: 'v@:')") % ctypes);
+				}
 			}
 		}
 	}
