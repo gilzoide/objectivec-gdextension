@@ -19,21 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
-#define __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
+#import "NSMethodSignature+Godot.hpp"
 
-#include <Foundation/Foundation.h>
-#include <godot_cpp/variant/variant.hpp>
+#include "objc_marshalling.hpp"
 
-using namespace godot;
+using namespace objcgdextension;
 
-@interface NSMethodSignature (ArgumentsFromData)
+@implementation NSMethodSignature (Godot)
 
-@property(readonly) NSUInteger totalArgumentSize;
-@property(readonly) String completeSignature;
+- (NSUInteger)totalArgumentSize {
+	NSUInteger totalSize = 0;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		NSUInteger size, align;
+		NSGetSizeAndAlignment([self getArgumentTypeAtIndex:i], &size, &align);
+		// TODO: consider alignment
+		totalSize += size;
+	}
+	return totalSize;
+}
 
-- (Array)arrayFromArgumentData:(const void *)data;
+- (String)completeSignature {
+	String signature(self.methodReturnType);
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		signature += [self getArgumentTypeAtIndex:i];
+	}
+	return signature;
+}
+
+- (Array)arrayFromArgumentData:(const void *)data {
+	Array args;
+	const uint8_t *ptr = (const uint8_t *) data;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		const char *type = [self getArgumentTypeAtIndex:i];
+		args.append(get_variant(type, ptr));
+		NSUInteger size, align;
+		NSGetSizeAndAlignment(type, &size, &align);
+		// TODO: consider alignment
+		ptr += size;
+	}
+	return args;
+}
 
 @end
-
-#endif  //  __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__

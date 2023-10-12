@@ -21,7 +21,7 @@
  */
 #include "GDCallableBlock.hpp"
 
-#include "NSMethodSignature+ArgumentsFromData.hpp"
+#include "NSMethodSignature+Godot.hpp"
 
 #include <objc/runtime.h>
 
