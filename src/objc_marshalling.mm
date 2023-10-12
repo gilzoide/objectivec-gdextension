@@ -237,6 +237,9 @@ bool set_variant(const char *objc_type, TDeref buffer, const Variant& value, Arr
 			}
 		}
 
+		case 'v':
+			return true;
+
 		case '*': {
 			PackedByteArray chars;
 			if (value.get_type() == Variant::PACKED_BYTE_ARRAY) {
