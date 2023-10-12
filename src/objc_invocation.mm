@@ -21,6 +21,7 @@
  */
 #include "objc_invocation.hpp"
 
+#include "NSMethodSignature+ArgumentsFromData.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 #include "objc_conversions.hpp"
@@ -35,13 +36,16 @@ namespace objcgdextension {
 
 NSInvocation *prepare_and_invoke(id target, const String& selector, const godot::Variant **argv, GDExtensionInt argc) {
 	SEL sel = to_selector(selector);
-	ERR_FAIL_COND_V_EDMSG(
-		![target respondsToSelector:sel],
-		nil,
-		String("Invalid call to %s: selector not supported") % format_selector_call(target, selector)
-	);
 
 	NSMethodSignature *signature = [target methodSignatureForSelector:sel];
+	ERR_FAIL_COND_V_MSG(
+		signature.numberOfArguments < 2
+			|| [signature getArgumentTypeAtIndex:0][0] != '@'
+			|| [signature getArgumentTypeAtIndex:1][0] != ':',
+		nil,
+		String("Invalid method signature '%s': expected at least 2 arguments, target and selector") % signature.completeSignature
+	);
+
 	int expected_argc = signature.numberOfArguments - 2;
 	ERR_FAIL_COND_V_MSG(
 		expected_argc != argc,

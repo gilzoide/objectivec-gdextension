@@ -30,6 +30,7 @@ using namespace godot;
 @interface NSMethodSignature (ArgumentsFromData)
 
 - (NSUInteger)totalArgumentSize;
+- (String)completeSignature;
 - (Array)arrayFromArgumentData:(const void *)data;
 - (Array)arrayFromInvocationArguments:(NSInvocation *)invocation;
 

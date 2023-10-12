@@ -38,6 +38,14 @@ using namespace objcgdextension;
 	return totalSize;
 }
 
+- (String)completeSignature {
+	String signature(self.methodReturnType);
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		signature += [self getArgumentTypeAtIndex:i];
+	}
+	return signature;
+}
+
 - (Array)arrayFromArgumentData:(const void *)data {
 	Array args;
 	const uint8_t *ptr = (const uint8_t *) data;
