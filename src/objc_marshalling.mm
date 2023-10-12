@@ -79,6 +79,11 @@ const char *skip_method_encodings(const char *type) {
 	return type;
 }
 
+struct InvocationArgument {
+	NSInvocation *invocation;
+	NSUInteger index;
+};
+
 template<typename T>
 T deref_as(const void *buffer) {
 	return *static_cast<const T *>(buffer);
@@ -88,6 +93,13 @@ template<typename T>
 T deref_as(NSInvocation *invocation) {
 	T value;
 	[invocation getReturnValue:&value];
+	return value;
+}
+
+template<typename T>
+T deref_as(InvocationArgument& arg) {
+	T value;
+	[arg.invocation getArgument:&value atIndex:arg.index];
 	return value;
 }
 
@@ -167,13 +179,25 @@ Variant get_result_variant(NSInvocation *invocation) {
 	return get_variant<NSInvocation *>(invocation.methodSignature.methodReturnType, invocation);
 }
 
+Variant get_argument_variant(NSInvocation *invocation, NSUInteger index) {
+	InvocationArgument arg = { invocation, index };
+	return get_variant<InvocationArgument&>([invocation.methodSignature getArgumentTypeAtIndex:index], arg);
+}
+
 template<typename T>
 bool set_value(void *buffer, const T& value) {
 	*static_cast<T *>(buffer) = value;
 	return true;
 }
 
-bool set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder) {
+template<typename T>
+bool set_value(NSInvocation *invocation, const T& value) {
+	[invocation setReturnValue:(void *) &value];
+	return true;
+}
+
+template<typename TDeref>
+bool set_variant(const char *objc_type, TDeref buffer, const Variant& value, Array& string_holder) {
 	objc_type = skip_method_encodings(objc_type);
 	switch (objc_type[0]) {
 		case 'B':
@@ -248,6 +272,14 @@ bool set_variant(const char *objc_type, void *buffer, const Variant& value, Arra
 		default:
 			ERR_FAIL_V_MSG(false, String("Argument with Objective-C encoded type '%s' is not support yet.") % String(objc_type));
 	}
+}
+
+bool set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder) {
+	return set_variant<void *>(objc_type, buffer, value, string_holder);
+}
+
+bool set_result_variant(NSInvocation *invocation, const Variant& value, Array& string_holder) {
+	return set_variant<NSInvocation *>(invocation.methodSignature.methodReturnType, invocation, value, string_holder);
 }
 
 }
