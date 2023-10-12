@@ -39,6 +39,7 @@ public:
 
 	ObjectiveCClass *find_class(const String& name) const;
 	ObjectiveCObject *create_block(const String& objCTypes, const Callable& implementation) const;
+	ObjectiveCObject *wrap_object(Object *godot_object) const;
 	
 	static ObjectiveCAPI *get_singleton();
 

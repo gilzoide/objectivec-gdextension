@@ -21,8 +21,10 @@
  */
 #include "ObjectiveCAPI.hpp"
 
+#include "GDObject.hpp"
 #include "GDCallableBlock.hpp"
 #include "ObjectiveCClass.hpp"
+#include "ObjectiveCObject.hpp"
 #include "objc_conversions.hpp"
 
 #include <Foundation/Foundation.h>
@@ -58,6 +60,11 @@ ObjectiveCObject *ObjectiveCAPI::create_block(const String& objCTypes, const Cal
 	}
 }
 
+ObjectiveCObject *ObjectiveCAPI::wrap_object(Object *godot_object) const {
+	ERR_FAIL_COND_V_MSG(![GDObject isCompatibleObject:godot_object], nullptr, "Object must implement 'func methodSignatureForSelector(String) -> String'");
+	return memnew(ObjectiveCObject([[GDObject alloc] initWithObject:godot_object], false));
+}
+
 ObjectiveCAPI *ObjectiveCAPI::get_singleton() {
 	return instance;
 }
@@ -65,6 +72,7 @@ ObjectiveCAPI *ObjectiveCAPI::get_singleton() {
 void ObjectiveCAPI::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("find_class", "name"), &ObjectiveCAPI::find_class);
 	ClassDB::bind_method(D_METHOD("create_block",  "objc_types", "implementation"), &ObjectiveCAPI::create_block);
+	ClassDB::bind_method(D_METHOD("wrap_object",  "godot_object"), &ObjectiveCAPI::wrap_object);
 }
 
 bool ObjectiveCAPI::_get(const StringName& name, Variant& r_value) {
