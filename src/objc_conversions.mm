@@ -46,6 +46,10 @@ SEL to_selector(const godot::String& string) {
 	return sel_registerName(chars.get_data());
 }
 
+String to_string(SEL selector) {
+	return String(sel_getName(selector));
+}
+
 String format_selector_call(id obj, const String& selector) {
 	return String("%s[%s %s]") % Array::make(
 		object_isClass(obj) ? "+" : "-",

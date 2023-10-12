@@ -21,7 +21,14 @@
  */
 #include "GDObject.hpp"
 
+#import "NSMethodSignature+ArgumentsFromData.hpp"
+#import "objc_conversions.hpp"
+#import "objc_marshalling.hpp"
+
+#include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
+
+using namespace objcgdextension;
 
 @implementation GDObject {
 	Object *_obj;
@@ -53,13 +60,36 @@
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
-	// TODO
+	@try {
+		if (_obj) {
+			String methodSignature = _obj->call("methodSignatureForSelector", to_string(aSelector));
+			if (!methodSignature.is_empty()) {
+				return [NSMethodSignature signatureWithObjCTypes:methodSignature.ascii().get_data()];
+			}
+		}
+	}
+	@catch (NSException *ex) {
+		ERR_PRINT(ex.description.UTF8String);
+	}
 	return [super methodSignatureForSelector:aSelector];
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
 	String methodName = [GDObject godotNameForSelector:anInvocation.selector];
-	// TODO
+	if (_obj) {
+		if (_obj->has_method(methodName)) {
+			Array args = [anInvocation.methodSignature arrayFromInvocationArguments:anInvocation];
+			Variant result = _obj->callv(methodName, args);
+			set_result_variant(anInvocation, result, args);
+			return;
+		}
+		else if (anInvocation.methodSignature.numberOfArguments == 0) {
+			Variant property = _obj->get(methodName);
+			Array string_holder;
+			set_result_variant(anInvocation, property, string_holder);
+			return;
+		}
+	}
 	[super forwardInvocation:anInvocation];
 }
 

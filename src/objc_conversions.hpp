@@ -33,6 +33,7 @@ namespace objcgdextension {
 Class class_from_string(const String& string);
 Protocol *protocol_from_string(const String& string);
 SEL to_selector(const String& string);
+String to_string(SEL selector);
 String format_selector_call(id obj, const String& selector);
 
 Variant to_variant(NSObject *obj);

@@ -31,6 +31,7 @@ using namespace godot;
 
 - (NSUInteger)totalArgumentSize;
 - (Array)arrayFromArgumentData:(const void *)data;
+- (Array)arrayFromInvocationArguments:(NSInvocation *)invocation;
 
 @end
 

@@ -52,4 +52,12 @@ using namespace objcgdextension;
 	return args;
 }
 
+- (Array)arrayFromInvocationArguments:(NSInvocation *)invocation {
+	Array args;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		args.append(get_argument_variant(invocation, i));
+	}
+	return args;
+}
+
 @end
