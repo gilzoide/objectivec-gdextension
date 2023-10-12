@@ -93,6 +93,10 @@ using namespace objcgdextension;
 	[super forwardInvocation:anInvocation];
 }
 
+- (Variant)variant {
+	return Variant(_obj);
+}
+
 + (BOOL)isCompatibleObject:(Object *)object {
 	if (object) {
 		return object->has_method("methodSignatureForSelector");

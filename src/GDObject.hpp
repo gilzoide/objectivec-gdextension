@@ -36,6 +36,8 @@ using namespace godot;
  */
 @interface GDObject : NSObject
 
+@property(readonly) Variant variant;
+
 + (instancetype)objectWithObject:(Object *)object;
 - (instancetype)initWithObject:(Object *)object;
 
