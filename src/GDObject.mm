@@ -83,7 +83,7 @@ using namespace objcgdextension;
 			set_result_variant(anInvocation, result, args);
 			return;
 		}
-		else if (anInvocation.methodSignature.numberOfArguments == 0) {
+		else if (anInvocation.methodSignature.numberOfArguments == 2) {
 			Variant property = _obj->get(methodName);
 			Array string_holder;
 			set_result_variant(anInvocation, property, string_holder);
@@ -91,6 +91,16 @@ using namespace objcgdextension;
 		}
 	}
 	[super forwardInvocation:anInvocation];
+}
+
+- (id)valueForUndefinedKey:(NSString *)key {
+	if (_obj) {
+		Variant value = _obj->get(key.UTF8String);
+		return to_nsobject(value);
+	}
+	else {
+		return [super valueForUndefinedKey:key];
+	}
 }
 
 - (Variant)variant {
