@@ -84,8 +84,8 @@ using namespace objcgdextension;
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
-	String methodName = [GDObject godotNameForSelector:anInvocation.selector];
 	if (_obj) {
+		String methodName = [GDObject godotNameForSelector:anInvocation.selector];
 		if (_obj->has_method(methodName)) {
 			Array args = anInvocation.argumentArray;
 			Variant result = _obj->callv(methodName, args);
