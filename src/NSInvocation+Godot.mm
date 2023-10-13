@@ -19,39 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_CONVERSIONS_HPP__
-#define __OBJC_CONVERSIONS_HPP__
+#include "NSInvocation+Godot.hpp"
 
-#include <Foundation/Foundation.h>
+#include "objc_marshalling.hpp"
 
-#include <godot_cpp/variant/variant.hpp>
+using namespace objcgdextension;
 
-using namespace godot;
+@implementation NSInvocation (Godot)
 
-namespace objcgdextension {
-
-Class class_from_string(const String& string);
-Protocol *protocol_from_string(const String& string);
-SEL to_selector(const String& string);
-String to_string(SEL selector);
-String format_selector_call(id obj, const String& selector);
-
-Variant to_variant(NSObject *obj);
-Variant to_variant(NSString *string);
-Variant to_variant(NSNumber *number);
-Variant to_variant(NSArray *array);
-Variant to_variant(NSDictionary *dictionary);
-Variant to_variant(NSData *data);
-
-NSObject *to_nsobject(const Variant& value);
-NSMutableString *to_nsmutablestring(const String& string);
-NSNumber *to_nsnumber(bool value);
-NSNumber *to_nsnumber(int64_t value);
-NSNumber *to_nsnumber(double value);
-NSMutableArray *to_nsmutablearray(const Array& array);
-NSMutableDictionary *to_nsmutabledictionary(const Dictionary& dictionary);
-NSMutableData *to_nsmutabledata(const PackedByteArray& bytes);
-
+- (Array)argumentArray {
+	Array args;
+	for (int i = 2; i < self.methodSignature.numberOfArguments; i++) {
+		args.append(get_argument_variant(self, i));
+	}
+	return args;
 }
 
-#endif  // __OBJC_CONVERSIONS_HPP__
+@end

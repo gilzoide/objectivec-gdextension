@@ -19,8 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_CONVERSIONS_HPP__
-#define __OBJC_CONVERSIONS_HPP__
+#ifndef __GDOOBJECT_HPP__
+#define __GDOOBJECT_HPP__
 
 #include <Foundation/Foundation.h>
 
@@ -28,30 +28,22 @@
 
 using namespace godot;
 
-namespace objcgdextension {
+/**
+ * Objective-C object that wraps Godot objects.
+ *
+ * Messaging this object will forward the calls to the Godot object,
+ * removing the last ":" and replacing the other ":" characters for "_".
+ */
+@interface GDObject : NSObject
 
-Class class_from_string(const String& string);
-Protocol *protocol_from_string(const String& string);
-SEL to_selector(const String& string);
-String to_string(SEL selector);
-String format_selector_call(id obj, const String& selector);
+@property(readonly) Variant variant;
 
-Variant to_variant(NSObject *obj);
-Variant to_variant(NSString *string);
-Variant to_variant(NSNumber *number);
-Variant to_variant(NSArray *array);
-Variant to_variant(NSDictionary *dictionary);
-Variant to_variant(NSData *data);
++ (instancetype)objectWithObject:(Object *)object retainingReference:(BOOL)shouldRetainReference;
+- (instancetype)initWithObject:(Object *)object retainingReference:(BOOL)shouldRetainReference;
 
-NSObject *to_nsobject(const Variant& value);
-NSMutableString *to_nsmutablestring(const String& string);
-NSNumber *to_nsnumber(bool value);
-NSNumber *to_nsnumber(int64_t value);
-NSNumber *to_nsnumber(double value);
-NSMutableArray *to_nsmutablearray(const Array& array);
-NSMutableDictionary *to_nsmutabledictionary(const Dictionary& dictionary);
-NSMutableData *to_nsmutabledata(const PackedByteArray& bytes);
++ (BOOL)isCompatibleObject:(Object *)object;
++ (String)godotNameForSelector:(SEL)selector;
 
-}
+@end
 
-#endif  // __OBJC_CONVERSIONS_HPP__
+#endif  // __GDOOBJECT_HPP__

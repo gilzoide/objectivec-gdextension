@@ -19,39 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __OBJC_CONVERSIONS_HPP__
-#define __OBJC_CONVERSIONS_HPP__
+#import "NSMethodSignature+Godot.hpp"
 
-#include <Foundation/Foundation.h>
+#include "objc_marshalling.hpp"
 
-#include <godot_cpp/variant/variant.hpp>
+using namespace objcgdextension;
 
-using namespace godot;
+@implementation NSMethodSignature (Godot)
 
-namespace objcgdextension {
-
-Class class_from_string(const String& string);
-Protocol *protocol_from_string(const String& string);
-SEL to_selector(const String& string);
-String to_string(SEL selector);
-String format_selector_call(id obj, const String& selector);
-
-Variant to_variant(NSObject *obj);
-Variant to_variant(NSString *string);
-Variant to_variant(NSNumber *number);
-Variant to_variant(NSArray *array);
-Variant to_variant(NSDictionary *dictionary);
-Variant to_variant(NSData *data);
-
-NSObject *to_nsobject(const Variant& value);
-NSMutableString *to_nsmutablestring(const String& string);
-NSNumber *to_nsnumber(bool value);
-NSNumber *to_nsnumber(int64_t value);
-NSNumber *to_nsnumber(double value);
-NSMutableArray *to_nsmutablearray(const Array& array);
-NSMutableDictionary *to_nsmutabledictionary(const Dictionary& dictionary);
-NSMutableData *to_nsmutabledata(const PackedByteArray& bytes);
-
+- (NSUInteger)totalArgumentSize {
+	NSUInteger totalSize = 0;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		NSUInteger size, align;
+		NSGetSizeAndAlignment([self getArgumentTypeAtIndex:i], &size, &align);
+		// TODO: consider alignment
+		totalSize += size;
+	}
+	return totalSize;
 }
 
-#endif  // __OBJC_CONVERSIONS_HPP__
+- (String)completeSignature {
+	String signature(self.methodReturnType);
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		signature += [self getArgumentTypeAtIndex:i];
+	}
+	return signature;
+}
+
+- (Array)arrayFromArgumentData:(const void *)data {
+	Array args;
+	const uint8_t *ptr = (const uint8_t *) data;
+	for (int i = 0; i < self.numberOfArguments; i++) {
+		const char *type = [self getArgumentTypeAtIndex:i];
+		args.append(get_variant(type, ptr));
+		NSUInteger size, align;
+		NSGetSizeAndAlignment(type, &size, &align);
+		// TODO: consider alignment
+		ptr += size;
+	}
+	return args;
+}
+
+@end

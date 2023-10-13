@@ -32,7 +32,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .scons-cache/
-          key: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}
+          key: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}-${{ hashfiles('.gitmodules', 'src/**') }}
+          restore-keys: |
+            ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}-
       - name: Build artifact
         run: |
           scons platform=${{ matrix.platform }} ios_simulator=${{ matrix.simulator }} arch=${{ matrix.arch }} target=${{ matrix.target }}

@@ -31,7 +31,9 @@ namespace objcgdextension {
 
 Variant get_variant(const char *objc_type, const void *buffer);
 Variant get_result_variant(NSInvocation *invocation);
+Variant get_argument_variant(NSInvocation *invocation, NSUInteger index);
 bool set_variant(const char *objc_type, void *buffer, const Variant& value, Array& string_holder);
+bool set_result_variant(NSInvocation *invocation, const Variant& value, Array& string_holder);
 
 }
 

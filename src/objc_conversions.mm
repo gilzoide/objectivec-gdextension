@@ -21,6 +21,7 @@
  */
 #include "objc_conversions.hpp"
 
+#include "GDObject.hpp"
 #include "ObjectiveCClass.hpp"
 #include "ObjectiveCObject.hpp"
 
@@ -46,6 +47,10 @@ SEL to_selector(const godot::String& string) {
 	return sel_registerName(chars.get_data());
 }
 
+String to_string(SEL selector) {
+	return String(sel_getName(selector));
+}
+
 String format_selector_call(id obj, const String& selector) {
 	return String("%s[%s %s]") % Array::make(
 		object_isClass(obj) ? "+" : "-",
@@ -68,6 +73,10 @@ Variant to_variant(NSObject *obj) {
 	else if ([obj isKindOfClass:NSNumber.class]) {
 		NSNumber *number = (NSNumber *) obj;
 		return to_variant(number);
+	}
+	else if ([obj isKindOfClass:GDObject.class]) {
+		GDObject *gdobj = (GDObject *) obj;
+		return gdobj.variant;
 	}
 	else {
 		return memnew(ObjectiveCObject(obj));
@@ -173,8 +182,11 @@ NSObject *to_nsobject(const Variant& value) {
 			else if (auto objc_obj = Object::cast_to<ObjectiveCObject>(obj)) {
 				return objc_obj->get_obj();
 			}
+			else if ([GDObject isCompatibleObject:obj]) {
+				return [GDObject objectWithObject:obj retainingReference:NO];
+			}
 			else {
-				ERR_FAIL_V_MSG(nil, String("Conversion from '%s' to NSObject* is not supported yet.") % obj->get_class());
+				ERR_FAIL_V_MSG(nil, String("Conversion from '%s' to NSObject* is not supported.") % obj->get_class());
 			}
 		}
 

@@ -19,19 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
-#define __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
+#ifndef __NSINVOCATION_GODOT_HPP__
+#define __NSINVOCATION_GODOT_HPP__
 
 #include <Foundation/Foundation.h>
 #include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
 
-@interface NSMethodSignature (ArgumentsFromData)
+@interface NSInvocation (Godot)
 
-- (NSUInteger)totalArgumentSize;
-- (Array)arrayFromArgumentData:(const void *)data;
+@property(readonly) Array argumentArray;
 
 @end
 
-#endif  //  __NSMETHOD_SIGNATURE_ARGUMENTS_FROM_DATA_HPP__
+#endif  //  __NSINVOCATION_GODOT_HPP__
