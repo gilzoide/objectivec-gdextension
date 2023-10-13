@@ -27,6 +27,7 @@
 
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 
 using namespace objcgdextension;
 
@@ -71,7 +72,7 @@ using namespace objcgdextension;
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
 	@try {
-		if (_obj) {
+		if (UtilityFunctions::is_instance_valid(_obj)) {
 			String ctypes = _obj->call("methodSignatureForSelector", to_string(aSelector));
 			if (!ctypes.is_empty()) {
 				NSMethodSignature *signature = [NSMethodSignature signatureWithObjCTypes:ctypes.ascii().get_data()];
@@ -94,7 +95,7 @@ using namespace objcgdextension;
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
-	if (_obj) {
+	if (UtilityFunctions::is_instance_valid(_obj)) {
 		String methodName = [GDObject godotNameForSelector:anInvocation.selector];
 		if (_obj->has_method(methodName)) {
 			Array args = anInvocation.argumentArray;
@@ -113,7 +114,7 @@ using namespace objcgdextension;
 }
 
 - (id)valueForUndefinedKey:(NSString *)key {
-	if (_obj) {
+	if (UtilityFunctions::is_instance_valid(_obj)) {
 		Variant value = _obj->get(key.UTF8String);
 		return to_nsobject(value);
 	}
