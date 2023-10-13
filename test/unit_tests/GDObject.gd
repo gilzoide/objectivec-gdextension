@@ -6,10 +6,10 @@ const NOTIFICATION_USER_INFO = { hello = "world" }
 
 var my_property = 5
 var notification_called = false
+var self_objc = ObjectiveC.wrap_object(self)
 
 
 func test_property() -> bool:
-	var self_objc = ObjectiveC.wrap_object(self)
 	assert(self_objc.my_property == my_property)
 	assert(self_objc.responds_to_selector("my_property"))
 	assert(self_objc.invoke("my_property") == my_property)
@@ -17,7 +17,6 @@ func test_property() -> bool:
 
 
 func test_method() -> bool:
-	var self_objc = ObjectiveC.wrap_object(self)
 	assert(self_objc.responds_to_selector("intToBool:"))
 	assert(self_objc.invoke("intToBool:", 1) == true)
 	assert(self_objc.invoke("intToBool:", 0) == false)
@@ -25,7 +24,6 @@ func test_method() -> bool:
 
 
 func test_notification() -> bool:
-	var self_objc = ObjectiveC.wrap_object(self)
 	var NSNotificationCenter = ObjectiveC.NSNotificationCenter.defaultCenter
 	NSNotificationCenter.invoke("addObserver:selector:name:object:", self_objc, "handleNotification:", NOTIFICATION_NAME, null)
 	NSNotificationCenter.invoke("postNotificationName:object:userInfo:", NOTIFICATION_NAME, null, NOTIFICATION_USER_INFO)

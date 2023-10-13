@@ -38,8 +38,8 @@ using namespace godot;
 
 @property(readonly) Variant variant;
 
-+ (instancetype)objectWithObject:(Object *)object;
-- (instancetype)initWithObject:(Object *)object;
++ (instancetype)objectWithObject:(Object *)object retainingReference:(BOOL)shouldRetainReference;
+- (instancetype)initWithObject:(Object *)object retainingReference:(BOOL)shouldRetainReference;
 
 + (BOOL)isCompatibleObject:(Object *)object;
 + (String)godotNameForSelector:(SEL)selector;

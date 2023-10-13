@@ -32,25 +32,31 @@ using namespace objcgdextension;
 
 @implementation GDObject {
 	Object *_obj;
+	BOOL _shouldRetainReference;
 }
 
-+ (instancetype)objectWithObject:(Object *)object {
-	return [[[self alloc] initWithObject:object] autorelease];
++ (instancetype)objectWithObject:(Object *)object retainingReference:(BOOL)shouldRetainReference {
+	return [[[self alloc] initWithObject:object retainingReference:shouldRetainReference] autorelease];
 }
 
-- (instancetype)initWithObject:(Object *)object {
+- (instancetype)initWithObject:(Object *)object retainingReference:(BOOL)shouldRetainReference {
 	if (self = [super init]) {
 		_obj = object;
-		if (RefCounted *ref = Object::cast_to<RefCounted>(object)) {
-			ref->reference();
+		_shouldRetainReference = shouldRetainReference;
+		if (shouldRetainReference) {
+			if (RefCounted *ref = Object::cast_to<RefCounted>(object)) {
+				ref->reference();
+			}
 		}
 	}
 	return self;
 }
 
 - (void)dealloc {
-	if (RefCounted *ref = Object::cast_to<RefCounted>(_obj)) {
-		ref->unreference();
+	if (_shouldRetainReference) {
+		if (RefCounted *ref = Object::cast_to<RefCounted>(_obj)) {
+			ref->unreference();
+		}
 	}
 	[super dealloc];
 }

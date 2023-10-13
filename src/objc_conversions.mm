@@ -183,7 +183,7 @@ NSObject *to_nsobject(const Variant& value) {
 				return objc_obj->get_obj();
 			}
 			else if ([GDObject isCompatibleObject:obj]) {
-				return [GDObject objectWithObject:obj];
+				return [GDObject objectWithObject:obj retainingReference:NO];
 			}
 			else {
 				ERR_FAIL_V_MSG(nil, String("Conversion from '%s' to NSObject* is not supported.") % obj->get_class());
