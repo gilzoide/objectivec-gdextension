@@ -59,6 +59,10 @@ using namespace objcgdextension;
 	return [self retain];
 }
 
+- (BOOL)respondsToSelector:(SEL)aSelector {
+	return [self methodSignatureForSelector:aSelector] != nil;
+}
+
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
 	@try {
 		if (_obj) {

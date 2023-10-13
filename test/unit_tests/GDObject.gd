@@ -11,12 +11,14 @@ var notification_called = false
 func test_property() -> bool:
 	var self_objc = ObjectiveC.wrap_object(self)
 	assert(self_objc.my_property == my_property)
+	assert(self_objc.responds_to_selector("my_property"))
 	assert(self_objc.invoke("my_property") == my_property)
 	return true
 
 
 func test_method() -> bool:
 	var self_objc = ObjectiveC.wrap_object(self)
+	assert(self_objc.responds_to_selector("intToBool:"))
 	assert(self_objc.invoke("intToBool:", 1) == true)
 	assert(self_objc.invoke("intToBool:", 0) == false)
 	return true
