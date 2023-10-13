@@ -25,6 +25,8 @@ Use at your own risk.
 - `to_dictionary` method for converting Objective-C objects that support enumeration and the `objectForKey:` message, like `NSDictionary`, to Godot `Dictionary`
 - Other useful methods, like `is_kind_of_class`, `responds_to_selector` and `conforms_to_protocol`
 - Supports creating blocks from a `Callable` and the corresponding Objective-C method signature
+- Supports passing Godot objects to Objective-C if they implement `func methodSignatureForSelector(String) -> String`.
+  Check out [GDObject.gd](test/unit_tests/GDObject.gd) for sample code.
 
 
 ## Caveats
