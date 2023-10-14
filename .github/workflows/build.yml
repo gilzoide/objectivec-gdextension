@@ -108,21 +108,13 @@ jobs:
           path: artifacts
       - name: Copy artifacts to build folder
         run: cp -r '${{ steps.download.outputs.download-path }}'/**/libobjcgdextension* addons/objc-gdextension/build
-        env:
-          MSYS_NO_PATHCONV: 1
       - name: Download Godot
         run: |
           curl --location https://github.com/godotengine/godot/releases/download/${{ matrix.godot-release }} --output godot.zip
           unzip godot.zip
-      # Must run Godot editor at least once to generate .godot folder
-      - name: Generate .godot folder
-        run: |
-          $GODOT_BIN --headless --quit --path test --editor
-        continue-on-error: true
-      # Now run the tests
       - name: Run tests
         run: |
-          $GODOT_BIN --headless --quit --path test --script test_entrypoint.gd
+          make test
 
   build_distribution_zip:
     name: Build distribution zip
@@ -130,8 +122,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: Download artifacts
         id: download
         uses: actions/download-artifact@v3
