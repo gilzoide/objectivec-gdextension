@@ -19,17 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include <gdextension-lite/gdextension-lite.h>
 
-#include <gdextension_interface.h>
+#define REGISTER_DUMMY_CLASS(name) \
+	{ \
+		GDExtensionClassCreationInfo class_info = { \
+			.is_abstract = 1, \
+		}; \
+		GDCLEANUP(godot_StringName) _name = godot_StringName_new_with_latin1_chars(#name); \
+		godot_classdb_register_extension_class(p_library, &_name, &Object_str, &class_info); \
+	}
 
-static void initialize(void *data, GDExtensionInitializationLevel level) {}
-static void deinitialize(void *data, GDExtensionInitializationLevel level) {}
+static void initialize(void *p_library, GDExtensionInitializationLevel level) {
+	if (level != GDEXTENSION_INITIALIZATION_SCENE) {
+		return;
+	}
+
+	GDCLEANUP(godot_StringName) Object_str = godot_StringName_new_with_latin1_chars("Object");
+
+	REGISTER_DUMMY_CLASS(ObjectiveCObject);
+	REGISTER_DUMMY_CLASS(ObjectiveCClass);
+	REGISTER_DUMMY_CLASS(ObjectiveCAPI);
+	REGISTER_DUMMY_CLASS(ObjectiveCPointer);
+}
+
+static void deinitialize(void *p_library, GDExtensionInitializationLevel level) {}
 
 GDExtensionBool objcgdextension_entrypoint(
 	const GDExtensionInterfaceGetProcAddress p_getprocaccess,
 	GDExtensionClassLibraryPtr p_library,
 	GDExtensionInitialization *r_initialization
 ) {
+	gdextension_lite_initialize(p_getprocaccess);
+	r_initialization->userdata = p_library;
 	r_initialization->initialize = &initialize;
 	r_initialization->deinitialize = &deinitialize;
 	return 1;
