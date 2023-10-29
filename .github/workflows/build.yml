@@ -75,6 +75,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install scons ${{ join(matrix.packages, ' ') }}
+      - name: Generate bindings
+        run: |
+          make -C lib/gdextension-lite generate-bindings
       - name: Build artifact
         run: |
           scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release build_library=false ${{ join(matrix.scons-args, ' ') }}
