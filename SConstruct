@@ -37,7 +37,7 @@ if env["platform"] in ["macos", "ios"]:
 else:
     dummy_env = Environment(
         CPPPATH="lib/gdextension-lite",
-        CFLAGS="-flto",
+        CFLAGS=["-flto", "-O2"],
     )
     library = dummy_env.SharedLibrary(
         "addons/objc-gdextension/build/libobjcgdextension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
