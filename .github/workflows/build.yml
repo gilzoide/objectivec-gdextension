@@ -75,6 +75,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install scons ${{ join(matrix.packages, ' ') }}
+          pip install typing-extensions
       - name: Generate bindings
         run: |
           make -C lib/gdextension-lite generate-bindings
