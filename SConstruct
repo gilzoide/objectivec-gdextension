@@ -35,9 +35,12 @@ if env["platform"] in ["macos", "ios"]:
         source=sources,
     )
 else:
-    dummy_env = Environment(CPPPATH="lib/godot-cpp/gdextension")
+    dummy_env = Environment(
+        CPPPATH="lib/gdextension-lite",
+        CFLAGS=["-flto", "-O2"],
+    )
     library = dummy_env.SharedLibrary(
         "addons/objc-gdextension/build/libobjcgdextension{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
-        source="src/dummy_main.c",
+        source=["src/dummy_main.c", "lib/gdextension-lite/gdextension-lite/gdextension-lite-one.c"]
     )
 Default(library)

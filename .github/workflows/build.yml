@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .scons-cache/
-          key: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}-${{ hashfiles('.gitmodules', 'src/**') }}
+          key: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}-${{ hashfiles('.gitmodules', 'SConstruct', 'src/**') }}
           restore-keys: |
             ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}-
       - name: Build artifact
@@ -75,6 +75,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install scons ${{ join(matrix.packages, ' ') }}
+          pip install typing-extensions
+      - name: Generate bindings
+        run: |
+          make -C lib/gdextension-lite generate-bindings
       - name: Build artifact
         run: |
           scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release build_library=false ${{ join(matrix.scons-args, ' ') }}
