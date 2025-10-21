@@ -11,12 +11,6 @@ if env["platform"] in ["macos", "ios"]:
     # Compile flags
     env.Append(LINKFLAGS="-framework Foundation")
 
-    # Compile with debugging symbols
-    if ARGUMENTS.get("debugging_symbols") == 'true':
-        if "-O2" in env["CCFLAGS"]:
-            env["CCFLAGS"].remove("-O2")
-        env.Append(CCFLAGS=["-g", "-O0"])
-
     # Setup variant build dir for each setup
     def remove_prefix(s, prefix):
         return s[len(prefix):] if s.startswith(prefix) else s

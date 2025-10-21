@@ -33,7 +33,6 @@
 namespace objcgdextension {
 
 ObjectiveCObject::ObjectiveCObject() : obj() {}
-
 ObjectiveCObject::ObjectiveCObject(id instance, bool retain) {
 	if (instance && retain) {
 		obj = [instance retain];

@@ -33,6 +33,8 @@ using namespace godot;
  *
  * Messaging this object will forward the calls to the Godot object,
  * removing the last ":" and replacing the other ":" characters for "_".
+ * For example, the selector "initWithObject:retainingReference:" will
+ * call the "initWithObject_retainingReference" method.
  */
 @interface GDObject : NSObject
 

@@ -42,7 +42,7 @@ Protocol *protocol_from_string(const String& string) {
 	return objc_getProtocol(chars.get_data());
 }
 
-SEL to_selector(const godot::String& string) {
+SEL to_selector(const String& string) {
 	CharString chars = string.ascii();
 	return sel_registerName(chars.get_data());
 }

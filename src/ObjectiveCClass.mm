@@ -30,7 +30,6 @@
 namespace objcgdextension {
 
 ObjectiveCClass::ObjectiveCClass() : ObjectiveCObject() {}
-
 ObjectiveCClass::ObjectiveCClass(Class cls) : ObjectiveCObject(cls) {}
 
 ObjectiveCObject *ObjectiveCClass::alloc(const Variant **argv, GDExtensionInt argc, GDExtensionCallError& error) {

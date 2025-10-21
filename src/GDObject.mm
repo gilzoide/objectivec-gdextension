@@ -72,7 +72,7 @@ using namespace objcgdextension;
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
 	@try {
-		if (UtilityFunctions::is_instance_valid(_obj)) {
+		if (_obj && UtilityFunctions::is_instance_id_valid(_obj->get_instance_id())) {
 			String ctypes = _obj->call("methodSignatureForSelector", to_string(aSelector));
 			if (!ctypes.is_empty()) {
 				NSMethodSignature *signature = [NSMethodSignature signatureWithObjCTypes:ctypes.ascii().get_data()];
@@ -95,7 +95,7 @@ using namespace objcgdextension;
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
-	if (UtilityFunctions::is_instance_valid(_obj)) {
+	if (_obj && UtilityFunctions::is_instance_id_valid(_obj->get_instance_id())) {
 		String methodName = [GDObject godotNameForSelector:anInvocation.selector];
 		if (_obj->has_method(methodName)) {
 			Array args = anInvocation.argumentArray;
@@ -114,7 +114,7 @@ using namespace objcgdextension;
 }
 
 - (id)valueForUndefinedKey:(NSString *)key {
-	if (UtilityFunctions::is_instance_valid(_obj)) {
+	if (_obj && UtilityFunctions::is_instance_id_valid(_obj->get_instance_id())) {
 		Variant value = _obj->get(key.UTF8String);
 		return to_nsobject(value);
 	}
