@@ -48,24 +48,22 @@ jobs:
 
   build_linux:
     name: ${{ matrix.platform }} (${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner || 'ubuntu-22.04' }}
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, x86_32]
+        arch: [x86_64, x86_32, arm64, arm32]
         platform: [linux, android]
         include:
           - platform: linux
             arch: x86_32
             packages: [g++-multilib]
-          - platform: android
+          - platform: linux
             arch: arm64
-          - platform: android
+            runner: ubuntu-22.04-arm
+        exclude:
+          - platform: linux
             arch: arm32
-            scons-args: android_api_level=19
-          - platform: android
-            arch: x86_32
-            scons-args: android_api_level=19
     steps:
       - uses: actions/checkout@v5
         with:
