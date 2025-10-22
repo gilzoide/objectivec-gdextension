@@ -15,6 +15,7 @@ build/*
 *.dll
 *.dylib
 *.framework
+*.xcframework
 compile_commands.json
 addons/objectivec-gdextension/LICENSE
 

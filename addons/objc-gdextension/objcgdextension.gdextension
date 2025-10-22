@@ -1,16 +1,14 @@
 [configuration]
-
 entry_symbol = "objcgdextension_entrypoint"
 compatibility_minimum = "4.1"
 
 [libraries]
-
 macos.debug = "build/libobjcgdextension.macos.template_debug.universal.dylib"
 macos.release = "build/libobjcgdextension.macos.template_release.universal.dylib"
-ios.debug = "build/libobjcgdextension.ios.template_debug.universal.dylib"
-ios.debug.simulator = "build/libobjcgdextension.ios.template_debug.universal.simulator.dylib"
-ios.release = "build/libobjcgdextension.ios.template_release.universal.dylib"
-ios.release.simulator = "build/libobjcgdextension.ios.template_release.universal.simulator.dylib"
+ios.debug = "build/libobjcgdextension.ios.template_debug.universal.xcframework"
+ios.debug.simulator = "build/libobjcgdextension.ios.template_debug.universal.simulator.xcframework"
+ios.release = "build/libobjcgdextension.ios.template_release.universal.xcframework"
+ios.release.simulator = "build/libobjcgdextension.ios.template_release.universal.simulator.xcframework"
 windows.x86_32 = "build/libobjcgdextension.windows.template_release.x86_32.dll"
 windows.x86_64 = "build/libobjcgdextension.windows.template_release.x86_64.dll"
 linux.x86_32 = "build/libobjcgdextension.linux.template_release.x86_32.so"
@@ -19,3 +17,17 @@ android.x86_32 = "build/libobjcgdextension.android.template_release.x86_32.so"
 android.x86_64 = "build/libobjcgdextension.android.template_release.x86_64.so"
 android.arm32 = "build/libobjcgdextension.android.template_release.arm32.so"
 android.arm64 = "build/libobjcgdextension.android.template_release.arm64.so"
+
+[dependencies]
+ios.debug = {
+  "build/libgodot-cpp.ios.template_debug.universal.xcframework": ""
+}
+ios.debug.simulator = {
+  "build/libgodot-cpp.ios.template_debug.universal.simulator.xcframework": ""
+}
+ios.release = {
+  "build/libgodot-cpp.ios.template_release.universal.xcframework": ""
+}
+ios.release.simulator = {
+  "build/libgodot-cpp.ios.template_release.universal.simulator.xcframework": ""
+}
