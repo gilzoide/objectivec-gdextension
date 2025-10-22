@@ -53,8 +53,11 @@ if env["platform"] in ["macos", "ios"]:
 else:
     dummy_env = Environment(
         CPPPATH="lib/gdextension-lite",
-        CFLAGS=["-flto", "-O2"],
     )
+    if env.get("is_msvc"):
+        dummy_env.Append(CFLAGS="/Zc:preprocessor")
+    else:
+        dummy_env.Append(CFLAGS="-flto")
     library = dummy_env.SharedLibrary(
         f"addons/objc-gdextension/build/libobjcgdextension{env["suffix"]}{env["SHLIBSUFFIX"]}",
         source=[
