@@ -11,6 +11,7 @@ ios.release = "build/libobjcgdextension.ios.template_release.universal.xcframewo
 ios.release.simulator = "build/libobjcgdextension.ios.template_release.universal.simulator.xcframework"
 windows.x86_32 = "build/libobjcgdextension.windows.template_release.x86_32.dll"
 windows.x86_64 = "build/libobjcgdextension.windows.template_release.x86_64.dll"
+windows.arm64 = "build/libobjcgdextension.windows.template_release.arm64.dll"
 linux.x86_32 = "build/libobjcgdextension.linux.template_release.x86_32.so"
 linux.x86_64 = "build/libobjcgdextension.linux.template_release.x86_64.so"
 android.x86_32 = "build/libobjcgdextension.android.template_release.x86_32.so"
