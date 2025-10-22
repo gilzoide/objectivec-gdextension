@@ -82,7 +82,7 @@ func _ready():
 
             # 3.4. Create blocks from Callable values
             # Note that you need to specify the Objective-C method signature,
-            # since Callables don't have static typing, but blocks to.
+            # since Callables don't have static typing, but blocks do.
             var alert_completion = func(): print("Alert dismissed!")
             var alert_completion_block = ObjectiveC.create_block("v", alert_completion)
 
