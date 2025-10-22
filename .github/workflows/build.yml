@@ -22,14 +22,14 @@ jobs:
           - platform: macos
             simulator: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - name: Install dependencies
         run: |
           brew install scons
       - name: Cache SCons files and compiled files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .scons-cache/
           key: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}-${{ hashfiles('.gitmodules', 'SConstruct', 'src/**') }}
@@ -39,7 +39,7 @@ jobs:
         run: |
           scons platform=${{ matrix.platform }} ios_simulator=${{ matrix.simulator }} arch=${{ matrix.arch }} target=${{ matrix.target }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}-${{ matrix.arch }}-${{ matrix.target }}
           path: |
@@ -68,7 +68,7 @@ jobs:
             arch: x86_32
             scons-args: android_api_level=19
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - name: Install dependencies
@@ -83,7 +83,7 @@ jobs:
         run: |
           scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release build_library=false ${{ join(matrix.scons-args, ' ') }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}-${{ matrix.arch }}
           path: |
@@ -99,15 +99,15 @@ jobs:
         include:
           - name: macOS
             runner-os: macos-latest
-            godot-release: 4.1.1-stable/Godot_v4.1.1-stable_macos.universal.zip
+            godot-release: 4.5.1-stable/Godot_v4.5.1-stable_macos.universal.zip
             godot-bin: ./Godot.app/Contents/MacOS/Godot
     env:
       GODOT_BIN: ${{ matrix.godot-bin }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Download artifacts
         id: download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
         with:
           path: artifacts
       - name: Copy artifacts to build folder
@@ -125,16 +125,16 @@ jobs:
     needs: [build_macos, build_linux]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Download artifacts
         id: download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
         with:
           path: artifacts
       - name: Copy artifacts to build folder
         run: cp -r ${{ steps.download.outputs.download-path }}/**/libobjcgdextension* addons/objc-gdextension/build
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: objc-gdextension
           path: |
