@@ -26,8 +26,9 @@
 		GDExtensionClassCreationInfo class_info = { \
 			.is_abstract = 1, \
 		}; \
-		GDCLEANUP(godot_StringName) _name = godot_new_StringName_with_latin1_chars(#name); \
+		godot_StringName _name = godot_new_StringName_with_latin1_chars(#name); \
 		godot_classdb_register_extension_class(p_library, &_name, &Object_str, &class_info); \
+		godot_StringName_destroy(&_name); \
 	}
 
 static void initialize(void *p_library, GDExtensionInitializationLevel level) {
@@ -35,12 +36,14 @@ static void initialize(void *p_library, GDExtensionInitializationLevel level) {
 		return;
 	}
 
-	GDCLEANUP(godot_StringName) Object_str = godot_new_StringName_with_latin1_chars("Object");
+	godot_StringName Object_str = godot_new_StringName_with_latin1_chars("Object");
 
 	REGISTER_DUMMY_CLASS(ObjectiveCObject);
 	REGISTER_DUMMY_CLASS(ObjectiveCClass);
 	REGISTER_DUMMY_CLASS(ObjectiveCAPI);
 	REGISTER_DUMMY_CLASS(ObjectiveCPointer);
+
+	godot_StringName_destroy(&Object_str);
 }
 
 static void deinitialize(void *p_library, GDExtensionInitializationLevel level) {}
