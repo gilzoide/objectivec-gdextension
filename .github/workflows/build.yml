@@ -42,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform }}-${{ matrix.arch }}-${{ matrix.target }}
+          name: ${{ matrix.platform }}-simulator=${{ matrix.simulator }}-${{ matrix.arch }}-${{ matrix.target }}
           path: |
             addons/objc-gdextension/build/libobjcgdextension.*
 
