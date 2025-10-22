@@ -55,9 +55,9 @@ else:
         CPPPATH="lib/gdextension-lite",
     )
     if env.get("is_msvc"):
-        dummy_env.Append(CFLAGS=["/O2", "/Zc:preprocessor"])
+        dummy_env.Append(CFLAGS=["/std:c11", "/O2"])
     else:
-        dummy_env.Append(CFLAGS=["-O2", "-flto"])
+        dummy_env.Append(CFLAGS=["-std=c11", "-O2", "-flto"])
     library = dummy_env.SharedLibrary(
         f"addons/objc-gdextension/build/libobjcgdextension{env["suffix"]}{env["SHLIBSUFFIX"]}",
         source=[
